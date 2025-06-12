@@ -11,10 +11,9 @@ namespace FollowMe.Actions;
 public class FollowLeaderAction(FollowMe plugin) : IGameAction
 {
     private readonly FollowMe plugin = plugin;
-    private Vector2 previousLeaderPos = Vector2.Zero; // Stocke la position précédente du leader
 
-    public int Priority => 1;
-    public TimeSpan Cooldown => TimeSpan.FromMilliseconds(45);
+    public int Priority => 1; // Priorité plus haute que TP par exemple
+    public TimeSpan Cooldown => TimeSpan.FromMilliseconds(45); // plus rapide que TP
     public string MutexKey => "followLeader";
 
     public bool CanExecute()
@@ -38,12 +37,13 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
         if (plugin.GameController.Area.CurrentArea.IsHideout)
             return false;
 
-        // Vérifier la distance du leader
+        // Check distance sur leaderEntity
         if (leaderEntity.DistancePlayer <= 22)
             return false;
 
         return true;
     }
+
 
     public void Execute()
     {
@@ -55,42 +55,43 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
 
         var playerEntity = plugin.GameController.Game.IngameState.Data.LocalPlayer;
         var playerPath = playerEntity.GetComponent<Pathfinding>();
-        var leaderPath = leaderEntity?.GetComponent<Pathfinding>();
 
+        var leaderPath = leaderEntity?.GetComponent<Pathfinding>();
         if (leaderPath == null || leaderPath.PathingNodes.Count == 0) return;
 
-        // Vérifier si le leader bouge
-        bool leaderIsMoving = previousLeaderPos != Vector2.Zero &&
-                              previousLeaderPos != leaderEntity.GridPosNum;
-        previousLeaderPos = leaderEntity.GridPosNum; // Mise à jour de la position précédente
-
-        // Comparer la destination du joueur avec sa position actuelle
-        bool playerAtTarget = playerPath != null &&
-                              playerPath.PathingNodes.Count > 0 &&
-                              playerPath.PathingNodes.Last() == playerEntity.GridPosNum;
-
-        if (!leaderIsMoving && playerAtTarget)
+        // Comparer les destinations si le joueur est déjà en mouvement
+        if (playerPath != null && playerPath.IsMoving && playerPath.PathingNodes.Count > 0)
         {
-            // Générer une nouvelle position proche du leader pour éviter de cliquer au même endroit
-            Vector2 newTarget = leaderEntity.GridPosNum + new Vector2(5, 5);
+            var playerTarget = playerPath.PathingNodes.Last();
+            var leaderTarget = leaderPath.PathingNodes.Last();
 
-            // Vérifier si une compétence de déplacement est disponible
-            var shortCut = plugin.AllSkills.FirstOrDefault(x => x.Skill.Name.Contains("Move"));
-            var shortcuts = plugin.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(7).Take(13).ToList();
+            float distance = Vector2.Distance(playerTarget, leaderTarget); 
+            plugin.LogMessage($"Distance to leader's target: {distance}");
+          
 
-            if (shortCut != null)
+        }
+
+        // Préparer l'utilisation du skill de déplacement
+        var shortCut = plugin.AllSkills.FirstOrDefault(x => x.Skill.Name.Contains("Move"));
+        var shortcuts = plugin.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(7).Take(13).ToList();
+
+        if (shortCut != null)
+        {
+            var sc = shortcuts[shortCut.Skill.SkillSlotIndex];
+            if (sc.MainKey != ConsoleKey.None)
             {
-                var sc = shortcuts[shortCut.Skill.SkillSlotIndex];
-                if (sc.MainKey != ConsoleKey.None)
-                {
-                    var targetScreenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(newTarget);
-                    if (targetScreenPos == Vector2.Zero) return;
+                var leaderScreenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(leaderPath.PathingNodes.Last());
 
-                    Input.SetCursorPos(targetScreenPos);
-                    Input.KeyPressRelease((Keys)sc.MainKey);
-                    plugin.LogMessage($"Déplacement ajusté : {newTarget}, Skill : {shortCut.Skill.Name}");
-                }
+                if (leaderScreenPos == Vector2.Zero)
+                    leaderScreenPos = plugin.GameController.IngameState.Camera.WorldToScreen(leaderEntity.PosNum);
+
+                if (leaderScreenPos == Vector2.Zero) return;
+
+                Input.SetCursorPos(leaderScreenPos);
+                Input.KeyPressRelease((Keys)sc.MainKey);
+                plugin.LogMessage($"Skill: {shortCut.Skill.InternalName} - {shortCut.Skill.Name} - {sc.MainKey}");
             }
         }
     }
+
 }
