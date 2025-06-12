@@ -9,39 +9,42 @@ namespace FollowMe
 {
     public interface IGameAction
     {
-        bool CanExecute();          // Vérifie les conditions
-        void Execute();             // Lance l'action
-        TimeSpan Cooldown { get; }  // Cooldown individuel
+        int Priority { get; }                  // Plus c’est bas, plus c’est prioritaire (0 = top)
+        bool CanExecute();                     // Condition d’activation
+        void Execute();                        // Ce que l’action fait
+        TimeSpan Cooldown { get; }             // Délai d'attente entre deux exécutions
+        string MutexKey { get; }               // Un identifiant de verrouillage pour éviter les conflits
     }
+
 
     public class ActionManager
     {
-        private readonly Queue<(IGameAction Action, DateTime ReadyTime)> actionQueue = new();
-        private bool isRunning = false;
+        private readonly List<IGameAction> actions = new();
+        private readonly Dictionary<string, DateTime> lastExecutionByMutex = new();
 
         public void Register(IGameAction action)
         {
-            if (action.CanExecute())
-                actionQueue.Enqueue((action, DateTime.Now + action.Cooldown));
+            if (!actions.Contains(action))
+                actions.Add(action);
         }
 
         public void Tick()
         {
-            if (isRunning || actionQueue.Count == 0)
-                return;
+            // Tri par priorité (plus petit d’abord)
+            var sorted = actions.OrderBy(a => a.Priority);
 
-            var (action, readyTime) = actionQueue.Peek();
-            if (DateTime.Now >= readyTime)
+            foreach (var action in sorted)
             {
-                isRunning = true;
-                try
+                var mutex = action.MutexKey ?? "global";
+
+                if (!action.CanExecute()) continue;
+
+                if (!lastExecutionByMutex.TryGetValue(mutex, out var lastExec) ||
+                    DateTime.Now - lastExec >= action.Cooldown)
                 {
                     action.Execute();
-                }
-                finally
-                {
-                    actionQueue.Dequeue();
-                    isRunning = false;
+                    lastExecutionByMutex[mutex] = DateTime.Now;
+                    break; // Exécute une seule action à la fois par Tick()
                 }
             }
         }

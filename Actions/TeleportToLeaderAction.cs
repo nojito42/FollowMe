@@ -12,13 +12,11 @@ namespace FollowMe.Actions;
 public class TeleportToLeaderAction : IGameAction
 {
     private readonly FollowMe plugin;
+    public TeleportToLeaderAction(FollowMe plugin) => this.plugin = plugin;
 
-    public TeleportToLeaderAction(FollowMe plugin)
-    {
-        this.plugin = plugin;
-    }
-
-    public TimeSpan Cooldown => TimeSpan.FromMilliseconds(1000);
+    public int Priority => 0; // Haute priorité
+    public TimeSpan Cooldown => TimeSpan.FromSeconds(3);
+    public string MutexKey => "teleport";
 
     public bool CanExecute()
     {
@@ -33,20 +31,20 @@ public class TeleportToLeaderAction : IGameAction
     public void Execute()
     {
         var leader = plugin.LeaderPlayerElement();
-        var ui = plugin.GameController.IngameState.IngameUi;
-
         if (leader == null) return;
 
         var tpPos = leader.TeleportButton.GetClientRectCache.Center.ToVector2Num();
         Input.SetCursorPos(tpPos);
         Input.Click(MouseButtons.Left);
 
+        var ui = plugin.GameController.IngameState.IngameUi;
         if (ui.PopUpWindow != null && ui.PopUpWindow.ChildCount > 0)
         {
             Input.KeyPressRelease(Keys.Enter);
-            plugin.LogMessage($"Teleported to {leader.PlayerName} in {leader.ZoneName}.");
+            plugin.LogMessage($"TP to {leader.PlayerName} in {leader.ZoneName}.");
             Input.SetCursorPos(plugin.GameController.Window.GetWindowRectangle().Center.ToVector2Num());
         }
     }
 }
+
 
