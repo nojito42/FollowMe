@@ -70,7 +70,7 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
         else
         {
             // Sinon, on prend simplement sa position actuelle
-            targetPos = leaderEntity.PosNum;
+            targetPos = leaderEntity.GridPosNum;
         }
 
         // Check si on est déjà en train de marcher vers une position proche
@@ -98,7 +98,7 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
             if (sc.MainKey != ConsoleKey.None)
             {
                 // Conversion de la cible en position écran
-                var screenPos = plugin.GameController.IngameState.Camera.WorldToScreen(targetPos);
+                var screenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(targetPos);
                 if (screenPos == Vector2.Zero) return;
 
                 Input.SetCursorPos(screenPos);
