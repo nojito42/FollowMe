@@ -48,46 +48,52 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
     public void Execute()
     {
         var leader = plugin.LeaderPlayerElement();
-        
         if (leader == null) return;
 
-        // Prendre la position à l’écran du leader
         var leaderEntity = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.Player]
-           .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);
-        var leaderScreenPos = plugin.GameController.IngameState.Camera.WorldToScreen(leaderEntity.PosNum);
-        if (leaderScreenPos == Vector2.Zero) return;
-        var ShortCut = plugin.AllSkills.FirstOrDefault(x => x.Skill.Name.Contains("Move"));   
-        var shortcuts= plugin.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(7).Take(13).ToList();
-        if (ShortCut != null)
+            .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);
+
+        var playerEntity = plugin.GameController.Game.IngameState.Data.LocalPlayer;
+        var playerPath = playerEntity.GetComponent<Pathfinding>();
+
+        var leaderPath = leaderEntity?.GetComponent<Pathfinding>();
+        if (leaderPath == null || leaderPath.PathingNodes.Count == 0) return;
+
+        // Comparer les destinations si le joueur est déjà en mouvement
+        if (playerPath != null && playerPath.IsMoving && playerPath.PathingNodes.Count > 0)
         {
-           var sc = shortcuts[ShortCut.Skill.SkillSlotIndex];
-           if(sc.MainKey != ConsoleKey.None)
+            var playerTarget = playerPath.PathingNodes.Last();
+            var leaderTarget = leaderPath.PathingNodes.Last();
+
+            float distance = Vector2.Distance(playerTarget, leaderTarget);
+            if (distance < 10f) // tolérance de 10 unités
             {
-                var leaderPath = leaderEntity.GetComponent<Pathfinding>();
-                if(leaderPath.PathingNodes.Count > 0 && leaderPath.IsMoving)
-                {
-                    leaderScreenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(leaderPath.PathingNodes.Last());
-                    plugin.LogMessage($"Using pathfinding node at {leaderScreenPos} for leader {leader.PlayerName}.");
-                }
-                Input.SetCursorPos(leaderScreenPos);
-                Input.KeyPressRelease((Keys)sc.MainKey); // Utiliser le raccourci principal
-                plugin.LogMessage($"Skill: {ShortCut.Skill.InternalName} - {ShortCut.Skill.Name} - {sc.MainKey}");
+                plugin.LogMessage("Déjà en route vers une destination proche de celle du leader.");
+                return;
             }
-           
         }
-        //    Input.SetCursorPos(leaderScreenPos);
-        //    Input.Click(MouseButtons.Left);
-        //    Input.KeyPressRelease(ShortCut.Skill.SkillSlotIndex + 1); // +1 car les raccourcis commencent à 1
-        //    plugin.LogMessage($"Skill: {ShortCut.Skill.InternalName} - {ShortCut.Skill.Name} - {shortcuts[ShortCut.Skill.SkillSlotIndex]}");
-        //}
-        //else
-        //{
-        //    plugin.AllSkills.ForEach(x => plugin.LogMessage($"Skill: {x.Skill.InternalName} - {x.Skill.Name} - {shortcuts[x.Skill.SkillSlotIndex]}"));
-        //    return;
-        //}
-        //// Déplacer la souris vers la position du leader
-        //Input.SetCursorPos(leaderScreenPos);
-        //Input.Click(MouseButtons.Left);
-        //plugin.LogMessage($"Following leader {leader.PlayerName} at distance {leaderEntity.DistancePlayer}.");
+
+        // Préparer l'utilisation du skill de déplacement
+        var shortCut = plugin.AllSkills.FirstOrDefault(x => x.Skill.Name.Contains("Move"));
+        var shortcuts = plugin.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(7).Take(13).ToList();
+
+        if (shortCut != null)
+        {
+            var sc = shortcuts[shortCut.Skill.SkillSlotIndex];
+            if (sc.MainKey != ConsoleKey.None)
+            {
+                var leaderScreenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(leaderPath.PathingNodes.Last());
+
+                if (leaderScreenPos == Vector2.Zero)
+                    leaderScreenPos = plugin.GameController.IngameState.Camera.WorldToScreen(leaderEntity.PosNum);
+
+                if (leaderScreenPos == Vector2.Zero) return;
+
+                Input.SetCursorPos(leaderScreenPos);
+                Input.KeyPressRelease((Keys)sc.MainKey);
+                plugin.LogMessage($"Skill: {shortCut.Skill.InternalName} - {shortCut.Skill.Name} - {sc.MainKey}");
+            }
+        }
     }
+
 }
