@@ -96,10 +96,9 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 
                             skillList.ForEach(skill =>
                             {
-                                if (skill.IsOnSkillBar)
-                                {
+                                
                                     LogMessage($"Skill: {skill.Name} is on skill bar. -> {skill.SkillSlotIndex}");
-                                }
+                                
                             });
 
                         }
