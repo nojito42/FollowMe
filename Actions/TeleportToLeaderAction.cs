@@ -15,7 +15,7 @@ public class TeleportToLeaderAction : IGameAction
     public TeleportToLeaderAction(FollowMe plugin) => this.plugin = plugin;
 
     public int Priority => 0; // Haute priorité
-    public TimeSpan Cooldown => TimeSpan.FromSeconds(3);
+    public TimeSpan Cooldown => TimeSpan.FromMilliseconds(500); // Délai d'attente entre deux exécutions
     public string MutexKey => "teleport";
 
     public bool CanExecute()
