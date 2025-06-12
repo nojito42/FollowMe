@@ -1,5 +1,6 @@
 ﻿using ExileCore;
 using ExileCore.PoEMemory;
+using ExileCore.PoEMemory.Components;
 using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Helpers;
@@ -79,13 +80,44 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
         {
             SetPartyListSettingsValues();
 
-            if(this.LeaderPlayerElement() != null && !MenuWindow.IsOpened)
+            if(this.LeaderPlayerElement() != null)
+            {
+                if(partyLeaderInfo != null)
+                {
+                    if(!partyLeaderInfo.IsInDifferentZone)
+                    {
+                        var leader = GameController.Entities
+                            .FirstOrDefault(x => x.GetComponent<Player>()?.PlayerName == this.LeaderPlayerElement().PlayerName);
+                        if(leader != null)
+                        {
+                            var skillList =leader.GetComponent<ExileCore.PoEMemory.Components.Actor>()?.ActorSkills
+                              .Where(x => x.IsOnSkillBar)
+                              .ToList();
+
+                            skillList.ForEach(skill =>
+                            {
+                                if (skill.IsOnSkillBar)
+                                {
+                                    LogMessage($"Skill: {skill.Name} is on skill bar. -> {skill.SkillSlotIndex}");
+                                }
+                            });
+
+                        }
+                    }
+                }
+            }
+           
+            if (this.LeaderPlayerElement() != null && !MenuWindow.IsOpened)
+            {
                 actionManager.Tick();
 
+            }
 
-             AllSkills = this.GameController.IngameState.IngameUi.SkillBar.Skills;
+
+            AllSkills = this.GameController.IngameState.IngameUi.SkillBar.Skills;
 
              Shortcuts = [.. this.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(5).Take(13)];
+
 
 
         }
