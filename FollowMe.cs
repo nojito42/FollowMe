@@ -3,6 +3,7 @@ using ExileCore.PoEMemory;
 using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Helpers;
+using FollowMe.Actions;
 using Microsoft.VisualBasic;
 using SharpDX;
 using System;
@@ -51,24 +52,9 @@ public static class FollowMeHelpers
     }
 
 }
-
-public class PartyLeader
-{
-    public string CharacterName { get; set; }
-    public Element LeaderElement { get; set; }
-    public Entity LeaderEntity { get; set; }
-    public override string ToString()
-    {
-        return CharacterName;
-    }
-
-    public string WritePlayerInfos()
-    {
-        return $"{CharacterName} - {LeaderElement}";
-    }
-}
 public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 {
+    private ActionManager actionManager;
 
     public List<PartyElementPlayerElement> partyElements = [];
     public PartyElementPlayerInfo partyLeaderInfo = null;
@@ -107,6 +93,9 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
     }
     public override bool Initialise()
     {
+        actionManager = new ActionManager();
+        actionManager.Register(new TeleportToLeaderAction(this));
+
         return true;
     }
 
@@ -123,16 +112,17 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
         if (this.IsInParty())
         {
             SetPartyListSettingsValues();
+            actionManager.Tick();
 
-            var leaderElement = this.LeaderPlayerElement();
-            var ui = this.GameController.IngameState.IngameUi;
-            if (leaderElement != null)
-            {
-                if (partyLeaderInfo.IsInDifferentZone)
-                {
-                    TryTeleportToLeader(leaderElement);
-                }
-            }
+            //var leaderElement = this.LeaderPlayerElement();
+            //var ui = this.GameController.IngameState.IngameUi;
+            //if (leaderElement != null)
+            //{
+            //    if (partyLeaderInfo.IsInDifferentZone)
+            //    {
+            //        TryTeleportToLeader(leaderElement);
+            //    }
+            //}
         
         }
 
