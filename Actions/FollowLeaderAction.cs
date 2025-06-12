@@ -65,12 +65,14 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
             var playerTarget = playerPath.PathingNodes.Last();
             var leaderTarget = leaderPath.PathingNodes.Last();
 
-            float distance = Vector2.Distance(playerTarget, leaderTarget);
-            if (distance < 10f) // tolérance de 10 unités
-            {
-                plugin.LogMessage("Déjà en route vers une destination proche de celle du leader.");
-                return;
-            }
+            float distance = Vector2.Distance(playerTarget, leaderTarget); 
+            plugin.LogMessage($"Distance to leader's target: {distance}");
+            //if (distance < 10f) // tolérance de 10 unités
+            //{
+            //    plugin.LogMessage("Déjà en route vers une destination proche de celle du leader.");
+            //    return;
+            //}
+
         }
 
         // Préparer l'utilisation du skill de déplacement

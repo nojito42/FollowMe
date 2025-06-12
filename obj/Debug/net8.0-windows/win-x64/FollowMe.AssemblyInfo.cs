@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FollowMe")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f46124d87d7c9f88d49716d05b85b772f6e27ce5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bdc5f107055f68b9171a9b2268c0284e7899ec3c")]
 [assembly: System.Reflection.AssemblyProductAttribute("FollowMe")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FollowMe")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
