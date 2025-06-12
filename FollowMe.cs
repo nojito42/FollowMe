@@ -74,7 +74,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
     public PartyElementPlayerInfo partyLeaderInfo = null;
 
     private DateTime _lastTeleportTime = DateTime.MinValue;
-    private readonly TimeSpan _teleportCooldown = TimeSpan.FromMilliseconds(200); // Cooldown de 5 secondes
+    private readonly TimeSpan _teleportCooldown = TimeSpan.FromMilliseconds(300); // Cooldown de 5 secondes
 
     private void TryTeleportToLeader(PartyElementPlayerElement leaderElement)
     {
