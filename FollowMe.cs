@@ -73,12 +73,18 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
         if (this.IsInParty())
         {
             SetPartyListSettingsValues();
+
+            // Si on peut se téléporter, on ajoute une action
+            var tpAction = new TeleportToLeaderAction(this);
+            if (tpAction.CanExecute())
+                actionManager.Register(tpAction);
+
             actionManager.Tick();
         }
 
         return null;
-
     }
+
 
     private void SetPartyListSettingsValues()
     {
