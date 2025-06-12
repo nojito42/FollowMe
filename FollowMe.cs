@@ -80,7 +80,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
     {
         if (DateTime.Now - _lastTeleportTime < _teleportCooldown)
         {
-            LogMessage("Teleport action on cooldown.");
+            //LogMessage("Teleport action on cooldown.");
             return;
         }
 
@@ -88,7 +88,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 
         if (leaderElement.TeleportButton.IsActive && !GameController.Area.CurrentArea.IsHideout)
         {
-            LogMessage($"Teleporting to party leader {leaderElement.PlayerName} in {leaderElement.ZoneName}...");
+            //LogMessage($"Teleporting to party leader {leaderElement.PlayerName} in {leaderElement.ZoneName}...");
 
             var centerTP = leaderElement.TeleportButton.GetClientRectCache.Center.ToVector2Num();
             Input.SetCursorPos(centerTP);
@@ -97,6 +97,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
             if (ui.PopUpWindow != null && ui.PopUpWindow.ChildCount > 0)
             {
                 Input.KeyPressRelease(Keys.Enter);
+                LogMessage($"Teleported to party leader {leaderElement.PlayerName} in {leaderElement.ZoneName}.");
                 var centerscreen = GameController.Window.GetWindowRectangle().Center.ToVector2Num();
                 Input.SetCursorPos(centerscreen);
             }
