@@ -13,7 +13,7 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
     private readonly FollowMe plugin = plugin;
 
     public int Priority => 1; // Priorité plus haute que TP par exemple
-    public TimeSpan Cooldown => TimeSpan.FromMilliseconds(15); // plus rapide que TP
+    public TimeSpan Cooldown => TimeSpan.FromMilliseconds(80); // plus rapide que TP
     public string MutexKey => "followLeader";
 
     public bool CanExecute()
@@ -48,6 +48,7 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
     public void Execute()
     {
         var leader = plugin.LeaderPlayerElement();
+        
         if (leader == null) return;
 
         // Prendre la position à l’écran du leader
@@ -55,10 +56,32 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
            .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);
         var leaderScreenPos = plugin.GameController.IngameState.Camera.WorldToScreen(leaderEntity.PosNum);
         if (leaderScreenPos == Vector2.Zero) return;
-
-        // Déplacer la souris vers la position du leader
-        Input.SetCursorPos(leaderScreenPos);
-        Input.Click(MouseButtons.Left);
-        plugin.LogMessage($"Following leader {leader.PlayerName} at distance {leaderEntity.DistancePlayer}.");
+        var ShortCut = plugin.AllSkills.FirstOrDefault(x => x.Skill.Name.Contains("Move"));   
+        var shortcuts= plugin.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(7).Take(13).ToList();
+        if (ShortCut != null)
+        {
+           var sc = shortcuts[ShortCut.Skill.SkillSlotIndex];
+           if(sc.MainKey != ConsoleKey.None)
+            {
+                Input.SetCursorPos(leaderScreenPos);
+                Input.KeyPressRelease((Keys)sc.MainKey); // Utiliser le raccourci principal
+                plugin.LogMessage($"Skill: {ShortCut.Skill.InternalName} - {ShortCut.Skill.Name} - {sc.MainKey}");
+            }
+           
+        }
+        //    Input.SetCursorPos(leaderScreenPos);
+        //    Input.Click(MouseButtons.Left);
+        //    Input.KeyPressRelease(ShortCut.Skill.SkillSlotIndex + 1); // +1 car les raccourcis commencent à 1
+        //    plugin.LogMessage($"Skill: {ShortCut.Skill.InternalName} - {ShortCut.Skill.Name} - {shortcuts[ShortCut.Skill.SkillSlotIndex]}");
+        //}
+        //else
+        //{
+        //    plugin.AllSkills.ForEach(x => plugin.LogMessage($"Skill: {x.Skill.InternalName} - {x.Skill.Name} - {shortcuts[x.Skill.SkillSlotIndex]}"));
+        //    return;
+        //}
+        //// Déplacer la souris vers la position du leader
+        //Input.SetCursorPos(leaderScreenPos);
+        //Input.Click(MouseButtons.Left);
+        //plugin.LogMessage($"Following leader {leader.PlayerName} at distance {leaderEntity.DistancePlayer}.");
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.VisualBasic;
 using SharpDX;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using Vector2 = System.Numerics.Vector2;
 
@@ -58,6 +59,9 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 
     public List<PartyElementPlayerElement> partyElements = [];
     public PartyElementPlayerInfo partyLeaderInfo = null;
+    public List<SkillElement> AllSkills;
+    private List<GameOffsets.Shortcut> Shortcuts;
+
     public override bool Initialise()
     {
         actionManager = new ActionManager();
@@ -77,6 +81,13 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 
             if(this.LeaderPlayerElement() != null && !MenuWindow.IsOpened)
                 actionManager.Tick();
+
+
+             AllSkills = this.GameController.IngameState.IngameUi.SkillBar.Skills;
+
+             Shortcuts = [.. this.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(5).Take(13)];
+
+
         }
 
         return null;
