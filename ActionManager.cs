@@ -7,23 +7,45 @@ using System.Threading.Tasks;
 
 namespace FollowMe
 {
+    public interface IGameAction
+    {
+        bool CanExecute();          // Vérifie les conditions
+        void Execute();             // Lance l'action
+        TimeSpan Cooldown { get; }  // Cooldown individuel
+    }
+
     public class ActionManager
     {
-        private readonly List<IFollowerAction> actions = [];
+        private readonly Queue<(IGameAction Action, DateTime ReadyTime)> actionQueue = new();
+        private bool isRunning = false;
 
-        public void Register(IFollowerAction action) => actions.Add(action);
+        public void Register(IGameAction action)
+        {
+            if (action.CanExecute())
+                actionQueue.Enqueue((action, DateTime.Now + action.Cooldown));
+        }
 
         public void Tick()
         {
-            foreach (var action in actions.OrderByDescending(a => a.Priority))
+            if (isRunning || actionQueue.Count == 0)
+                return;
+
+            var (action, readyTime) = actionQueue.Peek();
+            if (DateTime.Now >= readyTime)
             {
-                if (action.CanExecute())
+                isRunning = true;
+                try
                 {
                     action.Execute();
-                    break; // Exécute une seule action par tick
+                }
+                finally
+                {
+                    actionQueue.Dequeue();
+                    isRunning = false;
                 }
             }
         }
     }
+
 
 }

@@ -9,55 +9,44 @@ using System.Windows.Forms;
 
 namespace FollowMe.Actions;
 
-public class TeleportToLeaderAction : IFollowerAction
+public class TeleportToLeaderAction : IGameAction
 {
     private readonly FollowMe plugin;
-    private DateTime lastExecution = DateTime.MinValue;
-    private int attempts = 0;
 
     public TeleportToLeaderAction(FollowMe plugin)
     {
         this.plugin = plugin;
     }
 
-    public string Name => "TeleportToLeader";
-    public int Priority => 10;
-    public TimeSpan MinInterval => TimeSpan.FromMilliseconds(800);
-    public TimeSpan Timeout => TimeSpan.FromSeconds(5);
-    public int MaxAttempts => 3;
+    public TimeSpan Cooldown => TimeSpan.FromMilliseconds(1000);
 
     public bool CanExecute()
     {
-        var now = DateTime.Now;
-        if (now - lastExecution < MinInterval || attempts >= MaxAttempts) return false;
-
         var leader = plugin.LeaderPlayerElement();
         return leader != null &&
                plugin.partyLeaderInfo != null &&
                plugin.partyLeaderInfo.IsInDifferentZone &&
-               leader.TeleportButton.IsActive &&
+               leader.TeleportButton?.IsActive == true &&
                !plugin.GameController.Area.CurrentArea.IsHideout;
     }
 
     public void Execute()
     {
-        attempts++;
-        lastExecution = DateTime.Now;
-
         var leader = plugin.LeaderPlayerElement();
+        var ui = plugin.GameController.IngameState.IngameUi;
+
         if (leader == null) return;
 
-        var tpCenter = leader.TeleportButton.GetClientRectCache.Center.ToVector2Num();
-        Input.SetCursorPos(tpCenter);
+        var tpPos = leader.TeleportButton.GetClientRectCache.Center.ToVector2Num();
+        Input.SetCursorPos(tpPos);
         Input.Click(MouseButtons.Left);
 
-        var ui = plugin.GameController.IngameState.IngameUi;
-        if (ui.PopUpWindow?.ChildCount > 0)
+        if (ui.PopUpWindow != null && ui.PopUpWindow.ChildCount > 0)
         {
             Input.KeyPressRelease(Keys.Enter);
+            plugin.LogMessage($"Teleported to {leader.PlayerName} in {leader.ZoneName}.");
             Input.SetCursorPos(plugin.GameController.Window.GetWindowRectangle().Center.ToVector2Num());
         }
-
-        plugin.LogMessage($"[Action] Teleported to {leader.PlayerName}.");
     }
 }
+

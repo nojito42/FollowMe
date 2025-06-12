@@ -58,72 +58,22 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 
     public List<PartyElementPlayerElement> partyElements = [];
     public PartyElementPlayerInfo partyLeaderInfo = null;
-
-    private DateTime _lastTeleportTime = DateTime.MinValue;
-    private readonly TimeSpan _teleportCooldown = TimeSpan.FromMilliseconds(800); // Cooldown de 5 secondes
-
-    private void TryTeleportToLeader(PartyElementPlayerElement leaderElement)
-    {
-        if (DateTime.Now - _lastTeleportTime < _teleportCooldown)
-        {
-            //LogMessage("Teleport action on cooldown.");
-            return;
-        }
-
-        var ui = this.GameController.IngameState.IngameUi;
-
-        if (leaderElement.TeleportButton.IsActive && !GameController.Area.CurrentArea.IsHideout)
-        {
-            //LogMessage($"Teleporting to party leader {leaderElement.PlayerName} in {leaderElement.ZoneName}...");
-
-            var centerTP = leaderElement.TeleportButton.GetClientRectCache.Center.ToVector2Num();
-            Input.SetCursorPos(centerTP);
-            Input.Click(MouseButtons.Left);
-
-            if (ui.PopUpWindow != null && ui.PopUpWindow.ChildCount > 0)
-            {
-                Input.KeyPressRelease(Keys.Enter);
-                LogMessage($"Teleported to party leader {leaderElement.PlayerName} in {leaderElement.ZoneName}.");
-                var centerscreen = GameController.Window.GetWindowRectangle().Center.ToVector2Num();
-                Input.SetCursorPos(centerscreen);
-            }
-
-            _lastTeleportTime = DateTime.Now;
-        }
-    }
     public override bool Initialise()
     {
         actionManager = new ActionManager();
         actionManager.Register(new TeleportToLeaderAction(this));
-
         return true;
     }
 
     public override void AreaChange(AreaInstance area)
     {
     }
-
     public override Job Tick()
     {
-        if (this.IsInParty() == false)
-        {
-
-        }
         if (this.IsInParty())
         {
             SetPartyListSettingsValues();
             actionManager.Tick();
-
-            //var leaderElement = this.LeaderPlayerElement();
-            //var ui = this.GameController.IngameState.IngameUi;
-            //if (leaderElement != null)
-            //{
-            //    if (partyLeaderInfo.IsInDifferentZone)
-            //    {
-            //        TryTeleportToLeader(leaderElement);
-            //    }
-            //}
-        
         }
 
         return null;
@@ -140,7 +90,6 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
             if (partyElement == null || partyElement.PlayerName == null)
                 continue;
             Settings.PartyLeader.Values.Add(partyElement.PlayerName);
-
         }
     }
 
