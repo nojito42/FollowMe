@@ -1,0 +1,45 @@
+## Build results
+bin/
+obj/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio Code settings
+.vscode/
+
+## Rider settings
+.idea/
+
+## Logs
+*.log
+
+## NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+
+## Build artifacts
+*.dll
+*.exe
+*.pdb
+
+## Temporary files
+*.tmp
+*.bak
+*.swp
+*.DS_Store
+Thumbs.db
+
+## Debug/Release folders
+**/Debug/
+**/Release/
+
+## Others
+_ReSharper*/
+*.resharper
+*.vs/
