@@ -52,26 +52,43 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
 
         var leaderEntity = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.Player]
             .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);
+        if (leaderEntity == null) return;
+
+        var leaderPath = leaderEntity.GetComponent<Pathfinding>();
+        if (leaderPath == null) return;
 
         var playerEntity = plugin.GameController.Game.IngameState.Data.LocalPlayer;
         var playerPath = playerEntity.GetComponent<Pathfinding>();
 
-        var leaderPath = leaderEntity?.GetComponent<Pathfinding>();
-        if (leaderPath == null || leaderPath.PathingNodes.Count == 0) return;
+        Vector2 targetPos;
 
-        // Comparer les destinations si le joueur est déjà en mouvement
+        // Si le leader est en mouvement, on prend le dernier point de son path
+        if (leaderPath.IsMoving && leaderPath.PathingNodes.Count > 0)
+        {
+            targetPos = leaderPath.PathingNodes.Last();
+        }
+        else
+        {
+            // Sinon, on prend simplement sa position actuelle
+            targetPos = leaderEntity.PosNum;
+        }
+
+        // Check si on est déjà en train de marcher vers une position proche
         if (playerPath != null && playerPath.IsMoving && playerPath.PathingNodes.Count > 0)
         {
             var playerTarget = playerPath.PathingNodes.Last();
-            var leaderTarget = leaderPath.PathingNodes.Last();
+            float distance = Vector2.Distance(playerTarget, targetPos);
 
-            float distance = Vector2.Distance(playerTarget, leaderTarget); 
-            plugin.LogMessage($"Distance to leader's target: {distance}");
-          
+            plugin.LogMessage($"[Follow] Distance to leader target: {distance}");
 
+            if (distance < 10f) // Tolérance
+            {
+                plugin.LogMessage("[Follow] Déjà en route vers la cible, skip mouvement.");
+                return;
+            }
         }
 
-        // Préparer l'utilisation du skill de déplacement
+        // Utilisation du skill Move
         var shortCut = plugin.AllSkills.FirstOrDefault(x => x.Skill.Name.Contains("Move"));
         var shortcuts = plugin.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(7).Take(13).ToList();
 
@@ -80,18 +97,16 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
             var sc = shortcuts[shortCut.Skill.SkillSlotIndex];
             if (sc.MainKey != ConsoleKey.None)
             {
-                var leaderScreenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(leaderPath.PathingNodes.Last());
+                // Conversion de la cible en position écran
+                var screenPos = plugin.GameController.IngameState.Camera.WorldToScreen(targetPos);
+                if (screenPos == Vector2.Zero) return;
 
-                if (leaderScreenPos == Vector2.Zero)
-                    leaderScreenPos = plugin.GameController.IngameState.Camera.WorldToScreen(leaderEntity.PosNum);
-
-                if (leaderScreenPos == Vector2.Zero) return;
-
-                Input.SetCursorPos(leaderScreenPos);
+                Input.SetCursorPos(screenPos);
                 Input.KeyPressRelease((Keys)sc.MainKey);
-                plugin.LogMessage($"Skill: {shortCut.Skill.InternalName} - {shortCut.Skill.Name} - {sc.MainKey}");
+                plugin.LogMessage($"[Follow] Déplacement vers leader: {targetPos} via {sc.MainKey}");
             }
         }
     }
+
 
 }
