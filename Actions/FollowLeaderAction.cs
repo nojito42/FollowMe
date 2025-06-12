@@ -66,7 +66,7 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
                 var leaderPath = leaderEntity.GetComponent<Pathfinding>();
                 if(leaderPath.PathingNodes.Count > 0 && leaderPath.IsMoving)
                 {
-                    leaderScreenPos = plugin.GameController.IngameState.Data.GetGridMapScreenPosition(leaderPath.PathingNodes.Last());
+                    leaderScreenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(leaderPath.PathingNodes.Last());
                     plugin.LogMessage($"Using pathfinding node at {leaderScreenPos} for leader {leader.PlayerName}.");
                 }
                 Input.SetCursorPos(leaderScreenPos);
