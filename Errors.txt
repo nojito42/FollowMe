@@ -1,3 +1,0 @@
-Build failed:
-[12.06.2025 13:51:39, G:\Gaming\POE\ExileCore3.26\Plugins\Source\FollowMe\FollowMe.cs(142, 5)] CS0106: Le modificateur 'private' 'n'est pas valide pour cet élément
-[12.06.2025 13:51:39, G:\Gaming\POE\ExileCore3.26\Plugins\Source\FollowMe\FollowMe.cs(154, 6)] CS1513: } attendue
