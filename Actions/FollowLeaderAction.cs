@@ -63,6 +63,12 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
            var sc = shortcuts[ShortCut.Skill.SkillSlotIndex];
            if(sc.MainKey != ConsoleKey.None)
             {
+                var leaderPath = leaderEntity.GetComponent<Pathfinding>();
+                if(leaderPath.PathingNodes.Count > 0)
+                {
+                    leaderScreenPos = plugin.GameController.IngameState.Data.GetGridMapScreenPosition(leaderPath.PathingNodes.Last());
+                    plugin.LogMessage($"Using pathfinding node at {leaderScreenPos} for leader {leader.PlayerName}.");
+                }
                 Input.SetCursorPos(leaderScreenPos);
                 Input.KeyPressRelease((Keys)sc.MainKey); // Utiliser le raccourci principal
                 plugin.LogMessage($"Skill: {ShortCut.Skill.InternalName} - {ShortCut.Skill.Name} - {sc.MainKey}");
