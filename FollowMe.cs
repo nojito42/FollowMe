@@ -62,6 +62,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
     {
         actionManager = new ActionManager();
         actionManager.Register(new TeleportToLeaderAction(this));
+        actionManager.Register(new FollowLeaderAction(this));
         return true;
     }
 
@@ -70,10 +71,12 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
     }
     public override Job Tick()
     {
-        if (this.IsInParty())
+        if (this.IsInParty() )
         {
             SetPartyListSettingsValues();
-            actionManager.Tick(); // Appelle juste ça et il gère tout
+
+            if(this.LeaderPlayerElement() != null && !MenuWindow.IsOpened)
+                actionManager.Tick();
         }
 
         return null;
