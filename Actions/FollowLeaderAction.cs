@@ -38,7 +38,7 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
             return false;
 
         // Check distance sur leaderEntity
-        if (leaderEntity.DistancePlayer <= 22)
+        if (leaderEntity.DistancePlayer <= 15)
             return false;
 
         return true;
