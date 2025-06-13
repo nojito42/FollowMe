@@ -56,6 +56,8 @@ public static class FollowMeHelpers
 }
 public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 {
+    public TakeTransitionsAction TakeTransitionAction { get; private set; }
+
     private ActionManager actionManager;
 
     public List<PartyElementPlayerElement> partyElements = [];
@@ -65,11 +67,12 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 
     public override bool Initialise()
     {
+        TakeTransitionAction = new TakeTransitionsAction(this);
         actionManager = new ActionManager();
         actionManager.Register(new TeleportToLeaderAction(this));
         actionManager.Register(new FollowLeaderAction(this));
        // actionManager.Register(new UseAttackSkillAction(this));
-       actionManager.Register(new TakeTransitionsAction(this)); 
+       actionManager.Register(TakeTransitionAction); 
         return true;
     }
 

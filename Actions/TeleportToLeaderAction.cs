@@ -23,11 +23,10 @@ public class TeleportToLeaderAction(FollowMe plugin) : IGameAction
     {
         var leader = plugin.LeaderPlayerElement();
 
-        var potentialLabelWithSameZoneName = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.AreaTransition | EntityType.Portal | EntityType.TownPortal]
-         .FirstOrDefault(x => x.RenderName == leader.ZoneName);
+       
         return leader != null &&
             plugin.GameController.IsLoading == false &&
-            potentialLabelWithSameZoneName == null &&
+            plugin.TakeTransitionAction.CanExecute() == false&&
                plugin.partyLeaderInfo != null &&
                plugin.partyLeaderInfo.IsInDifferentZone &&
                leader.TeleportButton?.IsActive == true &&
