@@ -56,7 +56,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 
         return leaderActionTarget == cachedTransitionEntity &&
                !plugin.GameController.IsLoading &&
-               plugin.partyLeaderInfo?.IsInDifferentZone == true &&
+                
                !plugin.GameController.Area.CurrentArea.IsHideout;
     }
 
@@ -71,7 +71,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             return;
         }
 
-        var screenPos = plugin.GameController.IngameState.Camera.WorldToScreen(cachedTransitionEntity.BoundsCenterPosNum);
+        var screenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(cachedTransitionEntity.GridPosNum);
         if (screenPos == Vector2.Zero)
         {
             plugin.LogError("[Follow] Position écran invalide pour la transition.");
