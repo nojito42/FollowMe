@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Linq;
 using ExileCore.PoEMemory.Components;
 using GameOffsets.Native;
+using ExileCore.PoEMemory.MemoryObjects;
 
 namespace FollowMe.Actions;
 
@@ -66,9 +67,9 @@ public class UseAttackSkillAction(FollowMe plugin) : IGameAction
              ushort skillId = skills.Skill.Id; // À remplacer par ton ID plus tard
 
             var castWithPos = plugin.GameController.PluginBridge
-                .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition");
+                .GetMethod<Action<Entity, uint>>("MagicInput.CastSkillWithTarget");
 
-            castWithPos(targetPos.TruncateToVector2I(), skillId);
+            castWithPos(monsterEntity, skillId);
             plugin.LogMessage($"[Follow] Attaque vers {targetPos} avec skillId {skillId:X}");
         }
         catch (Exception ex)
