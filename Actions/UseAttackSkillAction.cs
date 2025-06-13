@@ -62,7 +62,8 @@ public class UseAttackSkillAction(FollowMe plugin) : IGameAction
 
         try
         {
-            const uint skillId = 0x400; // À remplacer par ton ID plus tard
+            var skills = plugin.GameController.IngameState.IngameUi.SkillBar.Skills.FirstOrDefault(x => (x.Skill.IsAttack || x.Skill.IsSpell) && x.Skill.IsOnCooldown == false && x.Skill.CanBeUsed);
+             ushort skillId = skills.Skill.Id; // À remplacer par ton ID plus tard
 
             var castWithPos = plugin.GameController.PluginBridge
                 .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition");
