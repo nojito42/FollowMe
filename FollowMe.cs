@@ -91,12 +91,12 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
                 .Where(x => x.IsValid)
                 .ToList();
 
-            portalTransitions.ForEach(transition =>
-            {
+            //portalTransitions.ForEach(transition =>
+            //{
                
-                    this.LogMessage($"Found portal transition with same zone name: {transition.RenderName} at {transition.DistancePlayer}.",1,SharpDX.Color.GreenYellow);
+            //        this.LogMessage($"Found portal transition with same zone name: {transition.RenderName} at {transition.DistancePlayer}.",1,SharpDX.Color.GreenYellow);
                 
-            });
+            //});
             foreach (var skill in skills)
             {
 

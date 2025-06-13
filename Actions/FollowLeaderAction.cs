@@ -13,7 +13,7 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
 {
     private readonly FollowMe plugin = plugin;
 
-    public int Priority => 1; // Priorité plus haute que TP par exemple
+    public int Priority => 2; // Priorité plus haute que TP par exemple
     public TimeSpan Cooldown => TimeSpan.FromMilliseconds(45); // plus rapide que TP
     public string MutexKey => "followLeader";
 

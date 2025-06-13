@@ -14,7 +14,7 @@ public class TeleportToLeaderAction(FollowMe plugin) : IGameAction
 {
     private readonly FollowMe plugin = plugin;
 
-    public int Priority => 0;
+    public int Priority => 1;
     public TimeSpan Cooldown => TimeSpan.FromMilliseconds(500);
     public string MutexKey => "teleport";
 
@@ -45,18 +45,15 @@ public class TeleportToLeaderAction(FollowMe plugin) : IGameAction
         if (potentialLabelWithSameZoneName != null && potentialLabelWithSameZoneName.DistancePlayer <= 55)
         {
 
-            plugin.LogMessage($"Teleporting to {potentialLabelWithSameZoneName.RenderName}.");
             var wts = plugin.GameController.IngameState.Camera.WorldToScreen(potentialLabelWithSameZoneName.BoundsCenterPosNum);
             if (wts != System.Numerics.Vector2.Zero)
             {
-                plugin.LogMessage($"Teleporting to {potentialLabelWithSameZoneName.RenderName} at {wts}.");
                 tpPos = wts;
                 Input.SetCursorPos(tpPos);
                 Input.Click(MouseButtons.Left);
                 if (ui.PopUpWindow != null && ui.PopUpWindow.ChildCount > 0)
                 {
                     Input.KeyPressRelease(Keys.Enter);
-                    plugin.LogMessage($"TP to {leader.PlayerName} in {leader.ZoneName}.");
 
                 }
                 return;
@@ -64,7 +61,6 @@ public class TeleportToLeaderAction(FollowMe plugin) : IGameAction
             }
         }
 
-        plugin.LogError($"Could not find teleport button for {leader.PlayerName} in {leader.ZoneName}. Using fallback position.");
         tpPos = leader.TeleportButton.GetClientRect().Center.ToVector2Num();
 
         Input.SetCursorPos(tpPos);
@@ -73,7 +69,6 @@ public class TeleportToLeaderAction(FollowMe plugin) : IGameAction
         if (ui.PopUpWindow != null && ui.PopUpWindow.ChildCount > 0)
         {
             Input.KeyPressRelease(Keys.Enter);
-            plugin.LogMessage($"TP to {leader.PlayerName} in {leader.ZoneName}.");
 
         }
     }

@@ -28,7 +28,8 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
          potentialLabelWithSameZoneName = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.AreaTransition | EntityType.Portal | EntityType.TownPortal]
             .FirstOrDefault(x => x.RenderName == leader.ZoneName);
 
-        plugin.LogMessage($"CanExecute: leader: {leader?.PlayerName}, potentialLabelWithSameZoneName: {potentialLabelWithSameZoneName?.RenderName}, IsLoading: {plugin.GameController.IsLoading}, IsInDifferentZone: {plugin.partyLeaderInfo?.IsInDifferentZone}, IsHideout: {plugin.GameController.Area.CurrentArea.IsHideout}",1,SharpDX.Color.Purple);
+        if(potentialLabelWithSameZoneName != null)
+            plugin.LogMessage($"Found potential label with same zone name: {potentialLabelWithSameZoneName.RenderName} at {potentialLabelWithSameZoneName.DistancePlayer}.",1,SharpDX.Color.Cyan);
         return leader != null &&
             potentialLabelWithSameZoneName != null &&
             plugin.GameController.IsLoading == false &&
