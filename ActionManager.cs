@@ -44,7 +44,7 @@ namespace FollowMe
                 {
                     action.Execute();
                     lastExecutionByMutex[mutex] = DateTime.Now;
-                    break; // Exécute une seule action à la fois par Tick()
+                    break;
                 }
             }
         }

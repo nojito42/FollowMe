@@ -149,7 +149,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
         }
         else
         {
-            Graphics.DrawTextWithBackground($"You are in a party. Leader : {this.LeaderPlayerElement().PlayerName}({this.LeaderPlayerElement().ZoneName})...", new Vector2(100, 100), Color.Green);
+            //Graphics.DrawTextWithBackground($"You are in a party. Leader : {this.LeaderPlayerElement().PlayerName}({this.LeaderPlayerElement().ZoneName})...", new Vector2(100, 100), Color.Green);
         }
     }
 }
