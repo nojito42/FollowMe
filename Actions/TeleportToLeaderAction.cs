@@ -40,31 +40,7 @@ public class TeleportToLeaderAction(FollowMe plugin) : IGameAction
 
         var tpPos = Vector2.Zero;
 
-        var potentialLabelWithSameZoneName = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.AreaTransition]
-                .FirstOrDefault(x => x.RenderName == leader.ZoneName);
         var ui = plugin.GameController.IngameState.IngameUi;
-
-
-        if (potentialLabelWithSameZoneName != null) plugin.LogMessage($"Found potential label with same zone name: {potentialLabelWithSameZoneName.RenderName} at {potentialLabelWithSameZoneName.DistancePlayer}.");
-        if (potentialLabelWithSameZoneName != null && potentialLabelWithSameZoneName.DistancePlayer <= 55)
-        {
-
-            var wts = plugin.GameController.IngameState.Camera.WorldToScreen(potentialLabelWithSameZoneName.BoundsCenterPosNum);
-            if (wts != System.Numerics.Vector2.Zero)
-            {
-                tpPos = wts;
-                Input.SetCursorPos(tpPos);
-                Input.Click(MouseButtons.Left);
-                if (ui.PopUpWindow != null && ui.PopUpWindow.ChildCount > 0)
-                {
-                    Input.KeyPressRelease(Keys.Enter);
-
-                }
-                return;
-
-            }
-        }
-
         tpPos = leader.TeleportButton.GetClientRect().Center.ToVector2Num();
 
         Input.SetCursorPos(tpPos);
