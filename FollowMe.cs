@@ -87,7 +87,16 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
             var skills = skillBar.Skills
                 .Where(x => x.Skill.IsOnSkillBar)
                 .ToList();
+            var portalTransitions = this.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.AreaTransition]
+                .Where(x => x.IsValid)
+                .ToList();
 
+            portalTransitions.ForEach(transition =>
+            {
+               
+                    this.LogMessage($"Found portal transition with same zone name: {transition.RenderName} at {transition.DistancePlayer}.",1,SharpDX.Color.GreenYellow);
+                
+            });
             foreach (var skill in skills)
             {
 
