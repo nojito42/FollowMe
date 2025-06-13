@@ -80,7 +80,21 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
         {
             SetPartyListSettingsValues();
 
-            if(this.LeaderPlayerElement() != null)
+            var skillBar = this.GameController.IngameState.IngameUi.SkillBar;
+
+            var skills = skillBar.Skills
+                .Where(x => x.Skill.IsOnSkillBar)
+                .ToList();
+
+            foreach (var skill in skills)
+            {
+                if (skill.Skill.ToString().Contains("Move"))
+                {
+                    this.LogMessage($"Found Move skill on skill bar at index {skill.Skill} {skill.Skill.Id}.");
+                }
+            }
+
+            if (this.LeaderPlayerElement() != null)
             {
                 if(partyLeaderInfo != null)
                 {
@@ -97,7 +111,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
                             skillList.ForEach(skill =>
                             {
                                 
-                                    LogMessage($"Skill: {skill.Name} is on skill bar. -> {skill.SkillSlotIndex}");
+                                    LogMessage($"Skill: {skill.Name} is on skill bar. -> {skill.SkillSlotIndex} -");
                                 
                             });
 

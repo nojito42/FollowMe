@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Windows.Forms;
 using System.Linq;
 using ExileCore.PoEMemory.Components;
+using GameOffsets.Native;
 
 namespace FollowMe.Actions;
 
@@ -43,8 +44,6 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
 
         return true;
     }
-
-
     public void Execute()
     {
         var leader = plugin.LeaderPlayerElement();
@@ -61,52 +60,100 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
         var playerPath = playerEntity.GetComponent<Pathfinding>();
 
         Vector2 targetPos;
-
-        // Si le leader est en mouvement, on prend le dernier point de son path
         if (leaderPath.IsMoving && leaderPath.PathingNodes.Count > 0)
-        {
             targetPos = leaderPath.PathingNodes.Last();
-        }
         else
-        {
-            // Sinon, on prend simplement sa position actuelle
             targetPos = leaderEntity.GridPosNum;
-        }
 
-        // Check si on est déjà en train de marcher vers une position proche
         if (playerPath != null && playerPath.IsMoving && playerPath.PathingNodes.Count > 0)
         {
             var playerTarget = playerPath.PathingNodes.Last();
             float distance = Vector2.Distance(playerTarget, targetPos);
 
-            plugin.LogMessage($"[Follow] Distance to leader target: {distance}");
-
-            if (distance < 10f) // Tolérance
+            if (distance < 10f)
             {
                 plugin.LogMessage("[Follow] Déjà en route vers la cible, skip mouvement.");
                 return;
             }
         }
 
-        // Utilisation du skill Move
-        var shortCut = plugin.AllSkills.FirstOrDefault(x => x.Skill.Name.Contains("Move"));
-        var shortcuts = plugin.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(7).Take(13).ToList();
-
-        if (shortCut != null)
+        try
         {
-            var sc = shortcuts[shortCut.Skill.SkillSlotIndex];
-            if (sc.MainKey != ConsoleKey.None)
-            {
-                // Conversion de la cible en position écran
-                var screenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(targetPos);
-                if (screenPos == Vector2.Zero) return;
+            var castWithPos = plugin.GameController.PluginBridge
+                .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition");
 
-                Input.SetCursorPos(screenPos);
-                Input.KeyPressRelease((Keys)sc.MainKey);
-                plugin.LogMessage($"[Follow] Déplacement vers leader: {targetPos} via {sc.MainKey}");
-            }
+            castWithPos(targetPos.TruncateToVector2I(), 10505);
+            plugin.LogMessage($"[Follow] Déplacement (CastSkillWithPosition) vers {targetPos}");
+        }
+        catch (Exception ex)
+        {
+            plugin.LogError($"[Follow] Échec du cast via PluginBridge : {ex.Message}");
         }
     }
+
+
+    //public void Execute()
+    //{
+    //    var leader = plugin.LeaderPlayerElement();
+    //    if (leader == null) return;
+
+    //    var leaderEntity = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.Player]
+    //        .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);
+    //    if (leaderEntity == null) return;
+
+    //    var leaderPath = leaderEntity.GetComponent<Pathfinding>();
+    //    if (leaderPath == null) return;
+
+    //    var playerEntity = plugin.GameController.Game.IngameState.Data.LocalPlayer;
+    //    var playerPath = playerEntity.GetComponent<Pathfinding>();
+
+    //    Vector2 targetPos;
+
+    //    // Si le leader est en mouvement, on prend le dernier point de son path
+    //    if (leaderPath.IsMoving && leaderPath.PathingNodes.Count > 0)
+    //    {
+    //        targetPos = leaderPath.PathingNodes.Last();
+    //    }
+    //    else
+    //    {
+    //        // Sinon, on prend simplement sa position actuelle
+    //        targetPos = leaderEntity.GridPosNum;
+    //    }
+
+    //    // Check si on est déjà en train de marcher vers une position proche
+    //    if (playerPath != null && playerPath.IsMoving && playerPath.PathingNodes.Count > 0)
+    //    {
+    //        var playerTarget = playerPath.PathingNodes.Last();
+    //        float distance = Vector2.Distance(playerTarget, targetPos);
+
+    //        plugin.LogMessage($"[Follow] Distance to leader target: {distance}");
+
+    //        if (distance < 10f) // Tolérance
+    //        {
+    //            plugin.LogMessage("[Follow] Déjà en route vers la cible, skip mouvement.");
+    //            return;
+    //        }
+    //    }
+
+    //    // Utilisation du skill Move
+    //    var shortCut = plugin.AllSkills.FirstOrDefault(x => x.Skill.Name.Contains("Move"));
+    //    var shortcuts = plugin.GameController.IngameState.ShortcutSettings.Shortcuts.Skip(7).Take(13).ToList();
+
+    //    if (shortCut != null)
+    //    {
+    //        var sc = shortcuts[shortCut.Skill.SkillSlotIndex];
+    //        if (sc.MainKey != ConsoleKey.None)
+    //        {
+    //            // Conversion de la cible en position écran
+    //            var screenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(targetPos);
+    //            if (screenPos == Vector2.Zero) return;
+
+    //            Input.SetCursorPos(screenPos);
+    //            Input.KeyPressRelease((Keys)sc.MainKey);
+    //            plugin.LogMessage($"[Follow] Déplacement vers leader: {targetPos} via {sc.MainKey}");
+    //        }
+    //    }
+    //}
 
 
 }
