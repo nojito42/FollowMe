@@ -140,7 +140,9 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 
     public override void Render()
     {
-        if (this.IsInParty() == false)
+        if (Settings.Enable == false ||MenuWindow.IsOpened)
+            return;
+        if (this.IsInParty() == false || GameController.IsLoading)
         {
             Graphics.DrawTextWithBackground("You are not in a party.", new Vector2(100, 100), Color.Red);
             return;
