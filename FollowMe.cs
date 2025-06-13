@@ -68,6 +68,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
         actionManager = new ActionManager();
         actionManager.Register(new TeleportToLeaderAction(this));
         actionManager.Register(new FollowLeaderAction(this));
+        actionManager.Register(new UseAttackSkillAction(this));
         return true;
     }
 
@@ -88,10 +89,9 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 
             foreach (var skill in skills)
             {
-                if (skill.Skill.ToString().Contains("Move"))
-                {
-                    this.LogMessage($"Found Move skill on skill bar at index {skill.Skill} {skill.Skill.Id}.");
-                }
+                
+                    this.LogMessage($"Found Move skill on skill bar at index {skill.Skill} {skill.Skill.Id} {skill.Skill.Id2}.");
+                
             }
 
             if (this.LeaderPlayerElement() != null)
