@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Numerics;
 using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Enums;
+using ExileCore.PoEMemory.Components;
 
 namespace FollowMe.Actions;
 
@@ -27,10 +28,20 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 
          potentialLabelWithSameZoneName = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.AreaTransition | EntityType.Portal | EntityType.TownPortal]
             .FirstOrDefault(x => x.RenderName == leader.ZoneName);
+        var leaderEntity = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.Player]
+            .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);
 
-        if(potentialLabelWithSameZoneName != null)
+       
+        if (potentialLabelWithSameZoneName != null)
             plugin.LogMessage($"Found potential label with same zone name: {potentialLabelWithSameZoneName.RenderName} at {potentialLabelWithSameZoneName.DistancePlayer}.",1,SharpDX.Color.Cyan);
+
+        var leaderActions = leaderEntity.GetComponent<Actor>().CurrentAction?.Target;
+        if (leaderActions == null )
+        {
+            return false;
+        }
         return leader != null &&
+            leaderActions == potentialLabelWithSameZoneName &&
             potentialLabelWithSameZoneName != null &&
             plugin.GameController.IsLoading == false &&
                plugin.partyLeaderInfo != null &&
