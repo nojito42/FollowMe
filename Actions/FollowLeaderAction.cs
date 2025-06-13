@@ -44,52 +44,52 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
 
         return true;
     }
-    public void Execute()
+public void Execute()
+{
+    var leader = plugin.LeaderPlayerElement();
+    if (leader == null) return;
+
+    var leaderEntity = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.Player]
+        .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);
+    if (leaderEntity == null) return;
+
+    var leaderPath = leaderEntity.GetComponent<Pathfinding>();
+    if (leaderPath == null) return;
+
+    var playerEntity = plugin.GameController.Game.IngameState.Data.LocalPlayer;
+    var playerPath = playerEntity.GetComponent<Pathfinding>();
+
+    Vector2 targetPos;
+    if (leaderPath.IsMoving && leaderPath.PathingNodes.Count > 0)
+        targetPos = leaderPath.PathingNodes.Last();
+    else
+        targetPos = leaderEntity.GridPosNum;
+
+    if (playerPath != null && playerPath.IsMoving && playerPath.PathingNodes.Count > 0)
     {
-        var leader = plugin.LeaderPlayerElement();
-        if (leader == null) return;
+        var playerTarget = playerPath.PathingNodes.Last();
+        float distance = Vector2.Distance(playerTarget, targetPos);
 
-        var leaderEntity = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.Player]
-            .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);
-        if (leaderEntity == null) return;
-
-        var leaderPath = leaderEntity.GetComponent<Pathfinding>();
-        if (leaderPath == null) return;
-
-        var playerEntity = plugin.GameController.Game.IngameState.Data.LocalPlayer;
-        var playerPath = playerEntity.GetComponent<Pathfinding>();
-
-        Vector2 targetPos;
-        if (leaderPath.IsMoving && leaderPath.PathingNodes.Count > 0)
-            targetPos = leaderPath.PathingNodes.Last();
-        else
-            targetPos = leaderEntity.GridPosNum;
-
-        if (playerPath != null && playerPath.IsMoving && playerPath.PathingNodes.Count > 0)
+        if (distance < 10f)
         {
-            var playerTarget = playerPath.PathingNodes.Last();
-            float distance = Vector2.Distance(playerTarget, targetPos);
-
-            if (distance < 10f)
-            {
-                plugin.LogMessage("[Follow] Déjà en route vers la cible, skip mouvement.");
-                return;
-            }
-        }
-
-        try
-        {
-            var castWithPos = plugin.GameController.PluginBridge
-                .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition");
-
-            castWithPos(targetPos.TruncateToVector2I(), 10505);
-            plugin.LogMessage($"[Follow] Déplacement (CastSkillWithPosition) vers {targetPos}");
-        }
-        catch (Exception ex)
-        {
-            plugin.LogError($"[Follow] Échec du cast via PluginBridge : {ex.Message}");
+            plugin.LogMessage("[Follow] Déjà en route vers la cible, skip mouvement.");
+            return;
         }
     }
+
+    try
+    {
+        var castWithPos = plugin.GameController.PluginBridge
+            .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition");
+
+        castWithPos(targetPos.TruncateToVector2I(), 0x400);
+        plugin.LogMessage($"[Follow] Déplacement (CastSkillWithPosition) vers {targetPos}");
+    }
+    catch (Exception ex)
+    {
+        plugin.LogError($"[Follow] Échec du cast via PluginBridge : {ex.Message}");
+    }
+}
 
 
     //public void Execute()
