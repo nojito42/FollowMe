@@ -72,7 +72,6 @@ public void Execute()
 
         if (distance < 10f)
         {
-            plugin.LogMessage("[Follow] Déjà en route vers la cible, skip mouvement.");
             return;
         }
     }
@@ -83,7 +82,6 @@ public void Execute()
             .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition");
 
         castWithPos(targetPos.TruncateToVector2I(), 0x400);
-        plugin.LogMessage($"[Follow] Déplacement (CastSkillWithPosition) vers {targetPos}");
     }
     catch (Exception ex)
     {

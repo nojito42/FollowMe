@@ -43,7 +43,7 @@ public static class FollowMeHelpers
                 if (playerInfo != null)
                 {
                     plugin.partyLeaderInfo = playerInfo;
-                    plugin.LogMessage($"Found party leader: {playerInfo.IsInDifferentZone}");
+                    //plugin.LogMessage($"Found party leader: {playerInfo.IsInDifferentZone}");
                 }
 
 
@@ -68,7 +68,8 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
         actionManager = new ActionManager();
         actionManager.Register(new TeleportToLeaderAction(this));
         actionManager.Register(new FollowLeaderAction(this));
-        actionManager.Register(new UseAttackSkillAction(this));
+       // actionManager.Register(new UseAttackSkillAction(this));
+       actionManager.Register(new TakeTransitionsAction(this)); 
         return true;
     }
 
@@ -89,9 +90,9 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 
             foreach (var skill in skills)
             {
-                
-                    this.LogMessage($"Found Move skill on skill bar at index {skill.Skill} {skill.Skill.Id} {skill.Skill.Id2}.");
-                
+
+                this.LogMessage($"Found Move skill on skill bar at index {skill.Skill} {skill.Skill.Id} {skill.Skill.Id2}.");
+
             }
 
             if (this.LeaderPlayerElement() != null)
@@ -111,7 +112,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
                             skillList.ForEach(skill =>
                             {
                                 
-                                    LogMessage($"Skill: {skill.Name} is on skill bar. -> {skill.SkillSlotIndex} -");
+                                   // LogMessage($"Skill: {skill.Name} is on skill bar. -> {skill.SkillSlotIndex} -");
                                 
                             });
 
