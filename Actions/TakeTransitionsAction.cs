@@ -16,7 +16,7 @@ namespace FollowMe.Actions;
 public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 {
     private readonly FollowMe plugin = plugin;
-    private Entity potentialLabelWithSameZoneName;
+    private Entity cachedTransitionEntity;
 
     public int Priority => 0;
     public TimeSpan Cooldown => TimeSpan.FromMilliseconds(25);
@@ -25,60 +25,61 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
     public bool CanExecute()
     {
         var leader = plugin.LeaderPlayerElement();
-
-         potentialLabelWithSameZoneName = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.AreaTransition | EntityType.Portal | EntityType.TownPortal]
-            .FirstOrDefault(x => x.RenderName == leader.ZoneName);
-        var leaderEntity = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.Player]
-            .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);
-
-       
-        if (potentialLabelWithSameZoneName != null)
-            plugin.LogMessage($"Found potential label with same zone name: {potentialLabelWithSameZoneName.RenderName} at {potentialLabelWithSameZoneName.DistancePlayer}.",1,SharpDX.Color.Cyan);
-
-        var leaderActions = leaderEntity.GetComponent<Actor>().CurrentAction?.Target;
-        if (leaderActions == null )
-        {
+        if (leader == null || plugin.GameController?.EntityListWrapper == null)
             return false;
-        }
-        return leader != null &&
-            leaderActions == potentialLabelWithSameZoneName &&
-            potentialLabelWithSameZoneName != null &&
-            plugin.GameController.IsLoading == false &&
-               plugin.partyLeaderInfo != null &&
-               plugin.partyLeaderInfo.IsInDifferentZone &&
+
+        var leaderEntity = plugin.GameController.EntityListWrapper
+            .ValidEntitiesByType.GetValueOrDefault(EntityType.Player)?
+            .FirstOrDefault(e => e?.GetComponent<Player>()?.PlayerName == leader.PlayerName);
+
+        if (leaderEntity == null)
+            return false;
+
+        // Transition candidates
+        var transitions = plugin.GameController.EntityListWrapper
+            .ValidEntitiesByType
+            .Where(kvp =>
+                kvp.Key.HasFlag(EntityType.AreaTransition) ||
+                kvp.Key.HasFlag(EntityType.Portal) ||
+                kvp.Key.HasFlag(EntityType.TownPortal))
+            .SelectMany(kvp => kvp.Value)
+            .Where(e => e?.RenderName == leader.ZoneName)
+            .ToList();
+
+        cachedTransitionEntity = transitions.FirstOrDefault();
+        if (cachedTransitionEntity == null)
+            return false;
+
+        var leaderActionTarget = leaderEntity.GetComponent<Actor>()?.CurrentAction?.Target;
+        if (leaderActionTarget == null)
+            return false;
+
+        return leaderActionTarget == cachedTransitionEntity &&
+               !plugin.GameController.IsLoading &&
+               plugin.partyLeaderInfo?.IsInDifferentZone == true &&
                !plugin.GameController.Area.CurrentArea.IsHideout;
     }
 
     public void Execute()
     {
-        var leader = plugin.LeaderPlayerElement();
-        if (leader == null) return;
+        if (cachedTransitionEntity == null)
+            return;
 
-        var tpPos = Vector2.Zero;
-
-
-        potentialLabelWithSameZoneName = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.AreaTransition | EntityType.Portal | EntityType.TownPortal]
-        .FirstOrDefault(x => x.RenderName == leader.ZoneName);
-
-        if (potentialLabelWithSameZoneName != null) plugin.LogMessage($"Found potential label with same zone name: {potentialLabelWithSameZoneName.RenderName} at {potentialLabelWithSameZoneName.DistancePlayer}.");
-        if (potentialLabelWithSameZoneName != null && potentialLabelWithSameZoneName.DistancePlayer <= 55)
+        if (cachedTransitionEntity.DistancePlayer > 55)
         {
-
-            plugin.LogMessage($"Teleporting to {potentialLabelWithSameZoneName.RenderName}.");
-            var wts = plugin.GameController.IngameState.Camera.WorldToScreen(potentialLabelWithSameZoneName.BoundsCenterPosNum);
-            if (wts != System.Numerics.Vector2.Zero)
-            {
-                plugin.LogMessage($"Teleporting to {potentialLabelWithSameZoneName.RenderName} at {wts}.");
-                tpPos = wts;
-                Input.SetCursorPos(tpPos);
-                Input.Click(MouseButtons.Left);
-            
-                return;
-
-            }
+            plugin.LogMessage($"[Follow] Transition '{cachedTransitionEntity.RenderName}' trop loin ({cachedTransitionEntity.DistancePlayer:F1}).", 1, SharpDX.Color.Yellow);
+            return;
         }
 
+        var screenPos = plugin.GameController.IngameState.Camera.WorldToScreen(cachedTransitionEntity.BoundsCenterPosNum);
+        if (screenPos == Vector2.Zero)
+        {
+            plugin.LogError("[Follow] Position écran invalide pour la transition.");
+            return;
+        }
+
+        plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {screenPos}.", 1, SharpDX.Color.Green);
+        Input.SetCursorPos(screenPos);
+        Input.Click(MouseButtons.Left);
     }
 }
-
-
