@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Numerics;
+using ExileCore.Shared.Enums;
 
 namespace FollowMe.Actions;
 
@@ -21,8 +22,12 @@ public class TeleportToLeaderAction(FollowMe plugin) : IGameAction
     public bool CanExecute()
     {
         var leader = plugin.LeaderPlayerElement();
+
+        var potentialLabelWithSameZoneName = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.AreaTransition | EntityType.Portal | EntityType.TownPortal]
+         .FirstOrDefault(x => x.RenderName == leader.ZoneName);
         return leader != null &&
             plugin.GameController.IsLoading == false &&
+            potentialLabelWithSameZoneName == null &&
                plugin.partyLeaderInfo != null &&
                plugin.partyLeaderInfo.IsInDifferentZone &&
                leader.TeleportButton?.IsActive == true &&
