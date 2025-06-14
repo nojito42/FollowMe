@@ -95,15 +95,23 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         //}
         //else
         //{
-            var screenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(cachedTransitionEntity.GridPosNum);
-            if (screenPos == Vector2.Zero)
+
+        var pl = plugin.GameController?.Game?.IngameState?.IngameUi?.ItemsOnGroundLabels
+                  .Where(x => x != null && x.IsVisible && x.Label != null && x.Label.IsValid &&
+                          x.Label.IsVisible && x.ItemOnGround != null &&
+                          (x.ItemOnGround.Metadata.ToLower().Contains("areatransition") ||
+                              x.ItemOnGround.Metadata.ToLower().Contains("portal"))) // IMPORTANT KEY IMPROVEMENT: Check portal text
+                  .OrderBy(x => x.ItemOnGround.DistancePlayer).FirstOrDefault(x=> x.ItemOnGround == cachedTransitionEntity);
+       
+
+        if (pl.Label.PositionNum == Vector2.Zero)
             {
                 plugin.LogError("[Follow] Position écran invalide pour la transition.");
                 return;
             }
 
-            plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {screenPos}.", 1, SharpDX.Color.Green);
-            Input.SetCursorPos(screenPos);
+            plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {pl.Label.PositionNum}.", 1, SharpDX.Color.Green);
+            Input.SetCursorPos(pl.Label.PositionNum);
             Input.Click(MouseButtons.Left);
         //}
        
