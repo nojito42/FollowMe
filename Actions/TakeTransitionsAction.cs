@@ -70,14 +70,14 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             return;
 
        
-        if(plugin.Settings.UseMagicInput)
-        {
-            plugin.GameController.PluginBridge
-                .GetMethod<Action<Entity, uint>>("MagicInput.TeleportToEntity")
-                .Invoke(cachedTransitionEntity, 0x400);
-        }
-        else
-        {
+        //if(plugin.Settings.UseMagicInput)
+        //{
+        //    plugin.GameController.PluginBridge
+        //        .GetMethod<Action<Entity, uint>>("MagicInput.TeleportToEntity")
+        //        .Invoke(cachedTransitionEntity, 0x400);
+        //}
+        //else
+        //{
             var screenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(cachedTransitionEntity.GridPosNum);
             if (screenPos == Vector2.Zero)
             {
@@ -88,7 +88,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {screenPos}.", 1, SharpDX.Color.Green);
             Input.SetCursorPos(screenPos);
             Input.Click(MouseButtons.Left);
-        }
+        //}
        
     }
 }
