@@ -51,7 +51,10 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 
         var leaderActionTarget = leaderEntity.GetComponent<Actor>()?.CurrentAction?.Target;
         if (leaderActionTarget == null)
+        {
+            plugin.LogMessage($"[Follow] No action target for leader '{leader.PlayerName}' at transition '{cachedTransitionEntity.RenderName}'.", 1, SharpDX.Color.Yellow);
             return false;
+        }
 
         var myActionTarget = plugin.GameController.Player.GetComponent<Actor>()?.CurrentAction?.Target;
 
