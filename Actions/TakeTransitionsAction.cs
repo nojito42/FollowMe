@@ -94,15 +94,16 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 
         if (plugin.Settings.UseMagicInput)
         {
+            
             plugin.GameController.PluginBridge
-                .GetMethod<Action<Entity, uint>>("MagicInput.TeleportToEntity")
+                .GetMethod<Action<Entity, uint>>("MagicInput.CastSkillWithTarget")
                 .Invoke(pl.ItemOnGround, 0x400);
         }
         else
         {
 
 
-
+         
 
             if (pl.Label.PositionNum == Vector2.Zero)
             {
