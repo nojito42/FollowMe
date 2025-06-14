@@ -40,7 +40,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         // Transition candidates
         var transitions = plugin.GameController.EntityListWrapper
             .ValidEntitiesByType[EntityType.AreaTransition | EntityType.Portal | EntityType.TownPortal]
-            .Where(e => e?.RenderName == leader.ZoneName).
+            .Where(e => e?.RenderName == leader.ZoneName && e.DistancePlayer < 25).
             OrderBy(e => e.DistancePlayer)
             .ToList();
         plugin.LogMessage($"[Follow] Found {transitions.Count} transitions for '{leader.ZoneName}' at distance {leaderEntity.DistancePlayer:F1}.", 1, SharpDX.Color.GreenYellow);
@@ -53,10 +53,15 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         if (leaderActionTarget == null)
             return false;
 
-        return leaderActionTarget == cachedTransitionEntity &&
-               !plugin.GameController.IsLoading &&
-                
-               !plugin.GameController.Area.CurrentArea.IsHideout;
+        var myActionTarget = plugin.GameController.Player.GetComponent<Actor>()?.CurrentAction?.Target;
+
+        if (myActionTarget != null && myActionTarget == cachedTransitionEntity)
+        {
+            plugin.LogMessage($"[Follow] Already at transition '{cachedTransitionEntity.RenderName}'.", 1, SharpDX.Color.Green);
+            return false;
+        }
+
+        return  leaderActionTarget == cachedTransitionEntity;
     }
 
     public void Execute()
@@ -64,12 +69,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         if (cachedTransitionEntity == null)
             return;
 
-        if (cachedTransitionEntity.DistancePlayer > 55)
-        {
-            plugin.LogMessage($"[Follow] Transition '{cachedTransitionEntity.RenderName}' trop loin ({cachedTransitionEntity.DistancePlayer:F1}).", 1, SharpDX.Color.Yellow);
-            return;
-        }
-
+       
         if(plugin.Settings.UseMagicInput)
         {
             plugin.GameController.PluginBridge
