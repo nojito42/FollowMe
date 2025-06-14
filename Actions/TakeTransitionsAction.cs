@@ -12,6 +12,7 @@ using ExileCore.Shared.Enums;
 using ExileCore.PoEMemory.Components;
 using GameOffsets.Native;
 using System.Threading;
+using ExileCore.PoEMemory.Elements;
 
 namespace FollowMe.Actions;
 
@@ -88,7 +89,10 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         if (cachedTransitionEntity == null)
             return;
 
-        var wts = plugin.GameController.IngameState.Camera.WorldToScreen(cachedTransitionEntity.BoundsCenterPosNum);
+        var label = plugin.GameController.IngameState.IngameUi.ItemsOnGroundLabels
+            .FirstOrDefault(l => l.ItemOnGround == cachedTransitionEntity);
+
+        var wts = label != null ? new Vector2(label.Label.Center.X,label.Label.Center.Y) : plugin.GameController.IngameState.Camera.WorldToScreen(cachedTransitionEntity.BoundsCenterPosNum);
         if (wts == Vector2.Zero)
         {
             plugin.LogError("[Follow] Position écran invalide pour la transition.");
