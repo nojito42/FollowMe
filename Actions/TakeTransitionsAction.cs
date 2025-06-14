@@ -43,6 +43,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             .Where(e => e?.RenderName == leader.ZoneName).
             OrderBy(e => e.DistancePlayer)
             .ToList();
+        plugin.LogMessage($"[Follow] Found {transitions.Count} transitions for '{leader.ZoneName}' at distance {leaderEntity.DistancePlayer:F1}.", 1, SharpDX.Color.GreenYellow);
 
         cachedTransitionEntity = transitions.FirstOrDefault();
         if (cachedTransitionEntity == null)

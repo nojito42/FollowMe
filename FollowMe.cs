@@ -88,9 +88,7 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
         IList<Shortcut> sc3 = mem.ReadStdVector<Shortcut>(vec2);
         shortcuts = sc3;
 
-        LogMessage(shortcuts.Count + " WTF" + "");
-        LogMessage(shortcuts.Count + " WTF" + "");
-
+  
 
 
         //var mem = GameController.Memory;
@@ -125,12 +123,6 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
     public override Job Tick()
     {
 
-       LogMessage("shortcuts count : " + shortcuts.Count + " " + tries, 1, SharpDX.Color.GreenYellow);
-
-        shortcuts.ToList().ForEach(shortcut =>
-        {
-            LogMessage($"Shortcut: {shortcut}", 1, SharpDX.Color.GreenYellow);
-        });
         if (this.IsInParty() )
         {
             SetPartyListSettingsValues();
@@ -143,20 +135,6 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
             var portalTransitions = this.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.AreaTransition]
                 .Where(x => x.IsValid)
                 .ToList();
-
-            //portalTransitions.ForEach(transition =>
-            //{
-               
-            //        this.LogMessage($"Found portal transition with same zone name: {transition.RenderName} at {transition.DistancePlayer}.",1,SharpDX.Color.GreenYellow);
-                
-            //});
-            foreach (var skill in skills)
-            {
-
-                this.LogMessage($"Found Move skill on skill bar at index {skill.Skill} {skill.Skill.Id} {skill.Skill.Id2}.");
-
-            }
-
             if (this.LeaderPlayerElement() != null)
             {
                 if(partyLeaderInfo != null)
