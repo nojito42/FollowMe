@@ -45,16 +45,16 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             plugin.LogMessage($"[Follow] No action target for leader '{leader.PlayerName}' at transition '{cachedTransitionEntity.RenderName}'.", 1, SharpDX.Color.Yellow);
             return false;
         }
-        else
-        {
+        else if (leaderActionTarget != null && leaderActionTarget.DistancePlayer < 15 && (leaderActionTarget.Type == EntityType.Portal || leaderActionTarget.Type == EntityType.TownPortal || leaderActionTarget.Type == EntityType.AreaTransition))
+         {
             plugin.LogMessage($"[Follow] Leader '{leader.PlayerName}' action target is '{leaderActionTarget.RenderName}' at distance {leaderEntity.DistancePlayer:F1}.", 1, SharpDX.Color.GreenYellow);
                 cachedTransitionEntity = leaderActionTarget;
                 return true;
         }
 
-
-        // Transition candidates
-        var transitions = plugin.GameController.EntityListWrapper
+            return false;
+            // Transition candidates
+            var transitions = plugin.GameController.EntityListWrapper
             .OnlyValidEntities
             .Where(e => e.DistancePlayer < 25 && (e.Type == EntityType.Portal || e.Type == EntityType.TownPortal || e.Type == EntityType.AreaTransition)).
             OrderBy(e => e.DistancePlayer)
