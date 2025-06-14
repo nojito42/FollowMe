@@ -35,6 +35,16 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         if (leaderEntity == null)
             return false;
 
+        var leaderActionTarget = leaderEntity.GetComponent<Actor>()?.CurrentAction?.Target;
+        if (leaderActionTarget == null)
+        {
+            plugin.LogMessage($"[Follow] No action target for leader '{leader.PlayerName}' at transition '{cachedTransitionEntity.RenderName}'.", 1, SharpDX.Color.Yellow);
+            return false;
+        }
+        else
+        {
+            plugin.LogMessage($"[Follow] Leader '{leader.PlayerName}' action target is '{leaderActionTarget.RenderName}' at distance {leaderEntity.DistancePlayer:F1}.", 1, SharpDX.Color.GreenYellow);
+        }
 
 
         // Transition candidates
@@ -49,12 +59,6 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         if (cachedTransitionEntity == null)
             return false;
 
-        var leaderActionTarget = leaderEntity.GetComponent<Actor>()?.CurrentAction?.Target;
-        if (leaderActionTarget == null)
-        {
-            plugin.LogMessage($"[Follow] No action target for leader '{leader.PlayerName}' at transition '{cachedTransitionEntity.RenderName}'.", 1, SharpDX.Color.Yellow);
-            return false;
-        }
 
         var myActionTarget = plugin.GameController.Player.GetComponent<Actor>()?.CurrentAction?.Target;
 
