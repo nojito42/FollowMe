@@ -39,8 +39,8 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 
         // Transition candidates
         var transitions = plugin.GameController.EntityListWrapper
-            .ValidEntitiesByType[EntityType.AreaTransition | EntityType.Portal | EntityType.TownPortal]
-            .Where(e => e.DistancePlayer < 25).
+            .OnlyValidEntities
+            .Where(e => e.DistancePlayer < 25 && (e.Type == EntityType.Portal || e.Type == EntityType.TownPortal || e.Type == EntityType.AreaTransition)).
             OrderBy(e => e.DistancePlayer)
             .ToList();
         plugin.LogMessage($"[Follow] Found {transitions.Count} transitions for '{leader.ZoneName}' at distance {leaderEntity.DistancePlayer:F1}.", 1, SharpDX.Color.GreenYellow);
