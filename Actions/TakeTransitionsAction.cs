@@ -87,32 +87,24 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         if (cachedTransitionEntity == null)
             return;
 
-        var pl = plugin.GameController?.Game?.IngameState?.IngameUi?.ItemsOnGroundLabels
-                 .FirstOrDefault(x => x.ItemOnGround == cachedTransitionEntity);
-        if (pl == null)
-            return;
+     
 
+        ////if (plugin.Settings.UseMagicInput)
+        ////{
 
-        //if (plugin.Settings.UseMagicInput)
-        //{
-
-        //    plugin.GameController.PluginBridge
-        //            .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition")
-        //        .Invoke(pl.Label.PositionNum.TruncateToVector2I(), 0x400);
-        //}
-        //else
-        //{
+        ////    plugin.GameController.PluginBridge
+        ////            .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition")
+        ////        .Invoke(pl.Label.PositionNum.TruncateToVector2I(), 0x400);
+        ////}
+        ////else
+        ////{
 
 
          
 
-            if (pl.Label.PositionNum == Vector2.Zero)
-            {
-                plugin.LogError("[Follow] Position écran invalide pour la transition.");
-                return;
-            }
+         
 
-            plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {pl.Label.PositionNum}.", 1, SharpDX.Color.Green);
+           plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {pl.Label.PositionNum}.", 1, SharpDX.Color.Green);
         // Set cursor position to the center of the label
         var wts = plugin.GameController.IngameState.Camera.WorldToScreen(cachedTransitionEntity.BoundsCenterPosNum);
         if (wts == Vector2.Zero)

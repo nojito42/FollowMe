@@ -22,6 +22,9 @@
       <HintPath>$(exapiPackage)\GameOffsets.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MagicInput">
+      <HintPath>..\..\Compiled\MagicInput\MagicInput.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
