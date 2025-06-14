@@ -94,30 +94,12 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             plugin.LogError("[Follow] Position écran invalide pour la transition.");
             return;
         }
+        plugin.LogMessage($"[Follow] Transition entity '{cachedTransitionEntity.RenderName}' at screen position {wts}.",1,SharpDX.Color.Crimson);
 
-        if (plugin.Settings.UseMagicInput)
-        {
-
-            plugin.GameController.PluginBridge
-                    .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition")
-                .Invoke(wts.RoundToVector2I(), 0x400);
-        }
-        else
-        {
-
-
-
-
-
-
-            //plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {pl.Label.PositionNum}.", 1, SharpDX.Color.Green);
-            // Set cursor position to the center of the label
-
-            Input.SetCursorPos(wts);
+        Input.SetCursorPos(wts);
         Thread.Sleep(10);
         Input.KeyDown(Keys.LButton);
-            Input.KeyUp(Keys.LButton);
-        }
+        Input.KeyUp(Keys.LButton);
 
     }
 }
