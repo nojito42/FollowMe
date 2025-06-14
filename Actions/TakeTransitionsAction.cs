@@ -112,8 +112,8 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             plugin.LogError("[Follow] Position écran invalide pour la transition.");
             return;
         }
-        //Input.SetCursorPos(pl.Label.PositionNum);
-            Input.SetCursorPositionAndClick(wts.ToSharpDx(),MouseButtons.Left);
+        Input.SetCursorPos(wts);
+            Input.KeyPressRelease(Keys.LButton);
         //}
        
     }
