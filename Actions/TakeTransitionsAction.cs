@@ -86,25 +86,25 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         if (cachedTransitionEntity == null)
             return;
 
-
-        //if (plugin.Settings.UseMagicInput)
-        //{
-        //    plugin.GameController.PluginBridge
-        //        .GetMethod<Action<Entity, uint>>("MagicInput.TeleportToEntity")
-        //        .Invoke(cachedTransitionEntity, 0x400);
-        //}
-        //else
-        //{
-
         var pl = plugin.GameController?.Game?.IngameState?.IngameUi?.ItemsOnGroundLabels
-                  .Where(x => x != null && x.IsVisible && x.Label != null && x.Label.IsValid &&
-                          x.Label.IsVisible && x.ItemOnGround != null &&
-                          (x.ItemOnGround.Metadata.ToLower().Contains("areatransition") ||
-                              x.ItemOnGround.Metadata.ToLower().Contains("portal"))) // IMPORTANT KEY IMPROVEMENT: Check portal text
-                  .OrderBy(x => x.ItemOnGround.DistancePlayer).FirstOrDefault(x=> x.ItemOnGround == cachedTransitionEntity);
-       
+                 .FirstOrDefault(x => x.ItemOnGround == cachedTransitionEntity);
+        if (pl == null)
+            return;
 
-        if (pl.Label.PositionNum == Vector2.Zero)
+
+        if (plugin.Settings.UseMagicInput)
+        {
+            plugin.GameController.PluginBridge
+                .GetMethod<Action<Entity, uint>>("MagicInput.TeleportToEntity")
+                .Invoke(pl.ItemOnGround, 0x400);
+        }
+        else
+        {
+
+
+
+
+            if (pl.Label.PositionNum == Vector2.Zero)
             {
                 plugin.LogError("[Follow] Position écran invalide pour la transition.");
                 return;
@@ -113,7 +113,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {pl.Label.PositionNum}.", 1, SharpDX.Color.Green);
             Input.SetCursorPos(pl.Label.PositionNum);
             Input.Click(MouseButtons.Left);
-        //}
+        }
        
     }
 }
