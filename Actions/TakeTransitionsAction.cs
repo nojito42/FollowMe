@@ -45,6 +45,8 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         else
         {
             plugin.LogMessage($"[Follow] Leader '{leader.PlayerName}' action target is '{leaderActionTarget.RenderName}' at distance {leaderEntity.DistancePlayer:F1}.", 1, SharpDX.Color.GreenYellow);
+                cachedTransitionEntity = leaderActionTarget;
+                return cachedTransitionEntity.DistancePlayer < 25;
         }
 
 
@@ -84,15 +86,15 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         if (cachedTransitionEntity == null)
             return;
 
-       
-        //if(plugin.Settings.UseMagicInput)
-        //{
-        //    plugin.GameController.PluginBridge
-        //        .GetMethod<Action<Entity, uint>>("MagicInput.TeleportToEntity")
-        //        .Invoke(cachedTransitionEntity, 0x400);
-        //}
-        //else
-        //{
+
+        if (plugin.Settings.UseMagicInput)
+        {
+            plugin.GameController.PluginBridge
+                .GetMethod<Action<Entity, uint>>("MagicInput.TeleportToEntity")
+                .Invoke(cachedTransitionEntity, 0x400);
+        }
+        else
+        {
             var screenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(cachedTransitionEntity.GridPosNum);
             if (screenPos == Vector2.Zero)
             {
@@ -103,7 +105,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {screenPos}.", 1, SharpDX.Color.Green);
             Input.SetCursorPos(screenPos);
             Input.Click(MouseButtons.Left);
-        //}
+        }
        
     }
 }
