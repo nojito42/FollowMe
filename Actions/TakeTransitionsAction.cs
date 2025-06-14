@@ -10,6 +10,7 @@ using System.Numerics;
 using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Enums;
 using ExileCore.PoEMemory.Components;
+using GameOffsets.Native;
 
 namespace FollowMe.Actions;
 
@@ -94,10 +95,10 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 
         if (plugin.Settings.UseMagicInput)
         {
-            
+
             plugin.GameController.PluginBridge
-                .GetMethod<Action<Entity, uint>>("MagicInput.CastSkillWithTarget")
-                .Invoke(pl.ItemOnGround, 0x400);
+                    .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition")
+                .Invoke(pl.Label.PositionNum.TruncateToVector2I(), 0x400);
         }
         else
         {
