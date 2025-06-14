@@ -11,6 +11,7 @@ using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Enums;
 using ExileCore.PoEMemory.Components;
 using GameOffsets.Native;
+using System.Threading;
 
 namespace FollowMe.Actions;
 
@@ -113,8 +114,10 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             return;
         }
         Input.SetCursorPos(wts);
-            Input.KeyPressRelease(Keys.LButton);
+        Thread.Sleep(10);
+        Input.KeyDown(Keys.LButton);
+            Input.KeyUp(Keys.LButton);
         //}
-       
+
     }
 }
