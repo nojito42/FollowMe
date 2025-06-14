@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Linq;
 using ExileCore.PoEMemory.Components;
 using GameOffsets.Native;
+using ExileCore.Shared.Enums;
 
 namespace FollowMe.Actions;
 
@@ -25,13 +26,27 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
         var currentArea = plugin.GameController.Area.CurrentArea;
         if(currentArea.IsTown && !plugin.Settings.FollowInTown)
             return false;
+        var leader = plugin.LeaderPlayerElement();
+        if (leader == null)
+            return false;
+        var transitions = plugin.GameController.EntityListWrapper
+           .ValidEntitiesByType
+           .Where(kvp =>
+               kvp.Key.HasFlag(EntityType.AreaTransition) ||
+               kvp.Key.HasFlag(EntityType.Portal) ||
+               kvp.Key.HasFlag(EntityType.TownPortal))
+           .SelectMany(kvp => kvp.Value)
+           .Where(e => e?.RenderName == leader.ZoneName).
+           OrderBy(e => e.DistancePlayer)
+           .ToList();
+        var playerAction = plugin.GameController.Player.GetComponent<Actor>()?.CurrentAction;
+        if(playerAction != null && transitions.Any(p=> p == playerAction.Target))
+            return false;
 
         if (plugin.partyLeaderInfo == null || plugin.partyLeaderInfo.IsInDifferentZone)
             return false;
 
-        var leader = plugin.LeaderPlayerElement();
-        if (leader == null)
-            return false;
+       
 
         var leaderEntity = plugin.GameController.EntityListWrapper.ValidEntitiesByType[ExileCore.Shared.Enums.EntityType.Player]
             .FirstOrDefault(x => x.GetComponent<Player>().PlayerName == leader.PlayerName);

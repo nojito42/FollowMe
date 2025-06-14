@@ -43,7 +43,8 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
                 kvp.Key.HasFlag(EntityType.Portal) ||
                 kvp.Key.HasFlag(EntityType.TownPortal))
             .SelectMany(kvp => kvp.Value)
-            .Where(e => e?.RenderName == leader.ZoneName)
+            .Where(e => e?.RenderName == leader.ZoneName).
+            OrderBy(e => e.DistancePlayer)
             .ToList();
 
         cachedTransitionEntity = transitions.FirstOrDefault();
@@ -71,15 +72,25 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             return;
         }
 
-        var screenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(cachedTransitionEntity.GridPosNum);
-        if (screenPos == Vector2.Zero)
+        if(plugin.Settings.UseMagicInput)
         {
-            plugin.LogError("[Follow] Position écran invalide pour la transition.");
-            return;
+            plugin.GameController.PluginBridge
+                .GetMethod<Action<Entity, uint>>("MagicInput.TeleportToEntity")
+                .Invoke(cachedTransitionEntity, 0x400);
         }
+        else
+        {
+            var screenPos = plugin.GameController.IngameState.Data.GetGridScreenPosition(cachedTransitionEntity.GridPosNum);
+            if (screenPos == Vector2.Zero)
+            {
+                plugin.LogError("[Follow] Position écran invalide pour la transition.");
+                return;
+            }
 
-        plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {screenPos}.", 1, SharpDX.Color.Green);
-        Input.SetCursorPos(screenPos);
-        Input.Click(MouseButtons.Left);
+            plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {screenPos}.", 1, SharpDX.Color.Green);
+            Input.SetCursorPos(screenPos);
+            Input.Click(MouseButtons.Left);
+        }
+       
     }
 }
