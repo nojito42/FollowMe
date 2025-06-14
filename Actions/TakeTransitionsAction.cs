@@ -93,15 +93,15 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             return;
 
 
-        if (plugin.Settings.UseMagicInput)
-        {
+        //if (plugin.Settings.UseMagicInput)
+        //{
 
-            plugin.GameController.PluginBridge
-                    .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition")
-                .Invoke(pl.Label.PositionNum.TruncateToVector2I(), 0x400);
-        }
-        else
-        {
+        //    plugin.GameController.PluginBridge
+        //            .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition")
+        //        .Invoke(pl.Label.PositionNum.TruncateToVector2I(), 0x400);
+        //}
+        //else
+        //{
 
 
          
@@ -115,7 +115,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {pl.Label.PositionNum}.", 1, SharpDX.Color.Green);
             Input.SetCursorPos(pl.Label.PositionNum);
             Input.Click(MouseButtons.Left);
-        }
+        //}
        
     }
 }
