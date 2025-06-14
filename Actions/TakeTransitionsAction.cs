@@ -104,7 +104,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 
          
 
-           plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {pl.Label.PositionNum}.", 1, SharpDX.Color.Green);
+           //plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {pl.Label.PositionNum}.", 1, SharpDX.Color.Green);
         // Set cursor position to the center of the label
         var wts = plugin.GameController.IngameState.Camera.WorldToScreen(cachedTransitionEntity.BoundsCenterPosNum);
         if (wts == Vector2.Zero)
