@@ -47,7 +47,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         {
             plugin.LogMessage($"[Follow] Leader '{leader.PlayerName}' action target is '{leaderActionTarget.RenderName}' at distance {leaderEntity.DistancePlayer:F1}.", 1, SharpDX.Color.GreenYellow);
                 cachedTransitionEntity = leaderActionTarget;
-                return cachedTransitionEntity.DistancePlayer < 25;
+                return true;
         }
 
 
