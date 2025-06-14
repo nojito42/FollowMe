@@ -100,7 +100,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 
             plugin.GameController.PluginBridge
                     .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition")
-                .Invoke(pl.Label.PositionNum.TruncateToVector2I(), 0x400);
+                .Invoke(wts.RoundToVector2I(), 0x400);
         }
         else
         {
