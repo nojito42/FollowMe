@@ -32,7 +32,6 @@ public class UseAttackSkillAction : IGameAction
 
     public void Execute()
     {
-        // Pour caster toutes les 0.5 secondes max
         if ((DateTime.Now - lastCast).TotalMilliseconds < 1)
             return;
 
@@ -40,21 +39,17 @@ public class UseAttackSkillAction : IGameAction
 
         try
         {
-            // Récupérer la position du joueur en Vector2i (int)
             var pos = plugin.GameController.Player.GridPosNum;
             Vector2i position = new Vector2i((int)pos.X, (int)pos.Y);
 
-            // On cast avec currentSkillId
             plugin.GameController.PluginBridge
                 .GetMethod<Action<Entity, uint>>("MagicInput.CastSkillWithTarget")
                 .Invoke(plugin.GameController.EntityListWrapper.OnlyValidEntities[new Random().Next(plugin.GameController.EntityListWrapper.OnlyValidEntities.Count-1)], 32771-0x400);
 
             plugin.LogMessage($"[Follow] CastSkillWithPosition appelé en {position} avec skillId {currentSkillId:X}");
 
-            // Incrémenter skillId pour le prochain cast (tu peux définir une limite si tu veux)
             currentSkillId++;
 
-            // Si tu veux boucler sur une plage, par ex 0x400 à 0x420
             if (currentSkillId > 0x10000)
                 currentSkillId = 0;
         }

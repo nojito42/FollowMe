@@ -5,6 +5,7 @@ using ExileCore.PoEMemory.Elements;
 using ExileCore.PoEMemory.MemoryObjects;
 using ExileCore.Shared.Helpers;
 using FollowMe.Actions;
+using GameOffsets.Native;
 using Microsoft.VisualBasic;
 using SharpDX;
 using System;
@@ -12,7 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Vector2 = System.Numerics.Vector2;
-
+using Shortcut = GameOffsets.Shortcut;
 namespace FollowMe;
 
 
@@ -57,6 +58,7 @@ public static class FollowMeHelpers
 public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
 {
     public TakeTransitionsAction TakeTransitionAction { get; private set; }
+    public IList<GameOffsets.Shortcut> shortcuts { get; private set; }
 
     private ActionManager actionManager;
 
@@ -64,9 +66,50 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
     public PartyElementPlayerInfo partyLeaderInfo = null;
     public List<SkillElement> AllSkills;
     private List<GameOffsets.Shortcut> Shortcuts;
+    int tries = 0;
 
     public override bool Initialise()
     {
+
+
+        var mem = GameController.Memory;
+        var address = GameController.IngameState.ShortcutSettings.Address;
+        //int maxTries = 10000;
+        //IList<Shortcut> sc = new List<Shortcut>();
+        //StdVector vec = new StdVector();
+        //while ((sc.Count <= 10 || sc.Count > 1000) && tries < maxTries)
+        //{
+        //    vec = mem.Read<StdVector>(address + (500 + tries));
+        //    sc = mem.ReadStdVector<Shortcut>(vec);
+        //    tries++;
+        //}
+
+        var vec2 = mem.Read<StdVector>(address + (785-1));
+        IList<Shortcut> sc3 = mem.ReadStdVector<Shortcut>(vec2);
+        shortcuts = sc3;
+
+        LogMessage(shortcuts.Count + " WTF" + "");
+        LogMessage(shortcuts.Count + " WTF" + "");
+
+
+
+        //var mem = GameController.Memory;
+        //var address = GameController.IngameState.ShortcutSettings.Address;
+        //int maxTries = 10000;
+        //int tries = 0;
+        //IList<GameOffsets.Shortcut> sc2 = new List<GameOffsets.Shortcut>();
+        //StdVector vec = new StdVector();
+        //while((sc2.Count <= 0 || sc2.Count > 1000) && tries < maxTries)
+        //{
+        //    vec = mem.Read<StdVector>(address - tries);
+        //    sc2 = mem.ReadStdVector<GameOffsets.Shortcut>(vec);
+        //    tries++;
+        //}
+        //var vec2 = mem.Read<StdVector>(address + tries-1);
+        //IList<GameOffsets.Shortcut> sc3 = mem.ReadStdVector<GameOffsets.Shortcut>(vec2);
+        //shortcuts = sc3;
+
+        LogMessage($"Found {shortcuts.Count} shortcuts after {tries} tries.", 1, SharpDX.Color.GreenYellow);
         TakeTransitionAction = new TakeTransitionsAction(this);
         actionManager = new ActionManager();
         actionManager.Register(new TeleportToLeaderAction(this));
@@ -81,6 +124,13 @@ public class FollowMe : BaseSettingsPlugin<FollowMeSettings>
     }
     public override Job Tick()
     {
+
+       LogMessage("shortcuts count : " + shortcuts.Count + " " + tries, 1, SharpDX.Color.GreenYellow);
+
+        shortcuts.ToList().ForEach(shortcut =>
+        {
+            LogMessage($"Shortcut: {shortcut}", 1, SharpDX.Color.GreenYellow);
+        });
         if (this.IsInParty() )
         {
             SetPartyListSettingsValues();

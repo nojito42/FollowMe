@@ -78,11 +78,27 @@ public void Execute()
 
     try
     {
-        var castWithPos = plugin.GameController.PluginBridge
-            .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition");
+            if (plugin.Settings.UseMagicInput)
+            {
 
-        castWithPos(targetPos.TruncateToVector2I(), 0x400);
-    }
+                var castWithPos = plugin.GameController.PluginBridge
+                    .GetMethod<Action<Vector2i, uint>>("MagicInput.CastSkillWithPosition");
+                castWithPos(targetPos.TruncateToVector2I(), 0x400);
+            }
+            else
+            {
+
+                var wts = plugin.GameController.IngameState.Data.GetGridScreenPosition(targetPos);
+                Input.SetCursorPos(wts);
+                var moveSkill = plugin.GameController.IngameState.IngameUi.SkillBar.Skills
+                    .FirstOrDefault(x => x.Skill.IsOnSkillBar && x.Skill.Id == 10505); // ID du skill de déplacement
+                if (moveSkill != null)
+                {
+                    var sc = plugin.shortcuts.Skip(7).Take(13).ToList()[moveSkill.Skill.SkillSlotIndex];
+                    Input.KeyPressRelease((Keys)sc.MainKey);
+                }
+            }
+        }
     catch (Exception ex)
     {
         plugin.LogError($"[Follow] Échec du cast via PluginBridge : {ex.Message}");
