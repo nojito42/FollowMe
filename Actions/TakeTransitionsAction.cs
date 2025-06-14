@@ -35,14 +35,11 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
         if (leaderEntity == null)
             return false;
 
+
+
         // Transition candidates
         var transitions = plugin.GameController.EntityListWrapper
-            .ValidEntitiesByType
-            .Where(kvp =>
-                kvp.Key.HasFlag(EntityType.AreaTransition) ||
-                kvp.Key.HasFlag(EntityType.Portal) ||
-                kvp.Key.HasFlag(EntityType.TownPortal))
-            .SelectMany(kvp => kvp.Value)
+            .ValidEntitiesByType[EntityType.AreaTransition | EntityType.Portal | EntityType.TownPortal]
             .Where(e => e?.RenderName == leader.ZoneName).
             OrderBy(e => e.DistancePlayer)
             .ToList();
