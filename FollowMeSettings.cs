@@ -12,6 +12,7 @@ public class FollowMeSettings : ISettings
 
     public ListNode PartyLeader { get; set; } = new ListNode();
     public ToggleNode UseMagicInput { get; set; } = new ToggleNode(false);
+    public ToggleNode FollowInTown { get; set; } = new ToggleNode(false);
     //Put all your settings here if you can.
     //There's a bunch of ready-made setting nodes,
     //nested menu support and even custom callbacks are supported.

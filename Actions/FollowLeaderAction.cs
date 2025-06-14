@@ -22,6 +22,10 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
         if (plugin.GameController.IsLoading)
             return false;
 
+        var currentArea = plugin.GameController.Area.CurrentArea;
+        if(currentArea.IsTown && !plugin.Settings.FollowInTown)
+            return false;
+
         if (plugin.partyLeaderInfo == null || plugin.partyLeaderInfo.IsInDifferentZone)
             return false;
 
@@ -46,6 +50,7 @@ public class FollowLeaderAction(FollowMe plugin) : IGameAction
     }
 public void Execute()
 {
+
     var leader = plugin.LeaderPlayerElement();
     if (leader == null) return;
 
