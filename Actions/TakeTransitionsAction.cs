@@ -113,7 +113,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             }
 
             plugin.LogMessage($"[Follow] Téléportation vers '{cachedTransitionEntity.RenderName}' à l’écran {pl.Label.PositionNum}.", 1, SharpDX.Color.Green);
-            Input.SetCursorPos(pl.Label.PositionNum);
+            Input.SetCursorPos(new Vector2(pl.Label.Center.X,pl.Label.Center.Y));
             Input.Click(MouseButtons.Left);
         //}
        
