@@ -24,6 +24,7 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
 
     public bool CanExecute()
     {
+        try { 
         var leader = plugin.LeaderPlayerElement();
         if (leader == null || plugin.GameController?.EntityListWrapper == null)
             return false;
@@ -67,8 +68,15 @@ public class TakeTransitionsAction(FollowMe plugin) : IGameAction
             plugin.LogMessage($"[Follow] Already at transition '{cachedTransitionEntity.RenderName}'.", 1, SharpDX.Color.Green);
             return false;
         }
+        
 
         return  leaderActionTarget == cachedTransitionEntity;
+        }
+        catch (Exception ex)
+        {
+            plugin.LogError($"[Follow] Error in CanExecute: {ex.Message}");
+            return false;
+        }
     }
 
     public void Execute()
